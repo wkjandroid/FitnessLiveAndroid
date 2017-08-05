@@ -6,7 +6,6 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.R;
 import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;

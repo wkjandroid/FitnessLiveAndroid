@@ -63,7 +63,9 @@
             android:launchMode="singleTop" />
         <activity android:name=".activity.VideoPlayerActivity" />
         <activity android:name=".activity.LiveActivity" />
-        <activity android:name=".activity.VideoShootActivity"></activity>
+        <activity android:name=".activity.VideoShootActivity" />
+        <activity android:name=".activity.DynamicActivity" />
+        <activity android:name=".activity.SysMessageActivity"></activity>
     </application>
 
 </manifest>

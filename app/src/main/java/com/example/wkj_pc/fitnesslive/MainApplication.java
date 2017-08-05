@@ -12,7 +12,7 @@ import org.litepal.LitePal;
  */
 
 public class MainApplication extends Application {
-    public static String cookie;   //qq用户的登录信息
+    public static String cookie;
     public static User loginUser;   //普通用户的登录信息
 
     @Override
