@@ -1,4 +1,5 @@
 package com.example.wkj_pc.fitnesslive.activity;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
@@ -22,8 +24,10 @@ import com.example.wkj_pc.fitnesslive.fragment.BottomSheetDialogFrag;
 import com.example.wkj_pc.fitnesslive.tools.BitmapUtils;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,10 +37,12 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     @BindView(R.id.home_nav_view)
     NavigationView homeNavView;
-    @BindView(R.id.navigation_home_tablayout)
-    TabLayout navigationHomeTablayout;
+
     @BindView(R.id.main_message_btn)
     ImageView messageShowBtn;
+    @BindView(R.id.main_live_video_image_view)
+    ImageView mainLiveVideoImageView;
+
     private View headerView;
     private ImageView amatarView;
     private TextView username;
@@ -51,64 +57,45 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         initActionBar();
         initMessageReceiver();
+        //设置滑出菜单
         bottomSheetDialogFrag = new BottomSheetDialogFrag();
         setNavigationView();/* 将滑出页面的菜单中加入点击事件 */
-        initNavigationTabLayout();
-        quitLoginUrl=getResources().getString(R.string.app_destroy_url);
+        quitLoginUrl = getResources().getString(R.string.app_destroy_url);
     }
-
-/**  有系统消息来到后，显示在toolbar中*/
+    /**
+     * 有系统消息来到后，显示在toolbar中
+     */
     private void initMessageReceiver() {
-        int count=3;
+        int count = 3;
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon_action_message_receiver)
-                .copy(Bitmap.Config.ARGB_8888,true);
-        if (count<1){
+                .copy(Bitmap.Config.ARGB_8888, true);
+        if (count < 1) {
             messageShowBtn.setImageBitmap(bitmap);
-        }else {
-            Bitmap showBitmap = BitmapUtils.decorateBitmapWithNums(bitmap,this,count);
+        } else {
+            Bitmap showBitmap = BitmapUtils.decorateBitmapWithNums(bitmap, this, count);
             messageShowBtn.setImageBitmap(showBitmap);
         }
         /** 跳转去处理系统的通知消息*/
         messageShowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this,VideoPlayerActivity.class));
+                startActivity(new Intent(MainActivity.this, SysMessageActivity.class));
             }
         });
-        
+
     }
-
-    /** 设置首页下面的导航栏 */
-    private void initNavigationTabLayout() {
-
-        navigationHomeTablayout.setTabTextColors(getResources().getColor(R.color.colorBeginText),
-                getResources().getColor(R.color.colorEndText));
-        navigationHomeTablayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition()==1)
-                    bottomSheetDialogFrag.show(getSupportFragmentManager(), "dialog");
-            }
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-            }
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-                if (tab.getPosition()==1)
-                   bottomSheetDialogFrag.show(getSupportFragmentManager(), "dialog");
-            }
-        });
-    }
-
-    /** 处于活动界面的时候，显示登录信息 */
+    /**
+     * 处于活动界面的时候，显示登录信息
+     */
     @Override
     protected void onResume() {
-        if (null!=MainApplication.loginUser){
+        if (null != MainApplication.loginUser) {
             Glide.with(this).load(MainApplication.loginUser.getAmatar()).asBitmap().into(amatarView);
             tishiView.setText(MainApplication.loginUser.getNickname());
         }
         super.onResume();
     }
+
     private void setNavigationView() {
         /* 设置头部信息*/
         headerView = homeNavView.getHeaderView(0);
@@ -118,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 drawerLayout.closeDrawers();
-                startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
             }
         });
         username = (TextView) headerView.findViewById(R.id.username);
@@ -128,14 +115,14 @@ public class MainActivity extends AppCompatActivity {
         homeNavView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                switch (item.getItemId()){
+                switch (item.getItemId()) {
                     case R.id.home_settings:
                         drawerLayout.closeDrawers();
-                        startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
                         break;
                     case R.id.home_register:
                         drawerLayout.closeDrawers();
-                        startActivity(new Intent(MainActivity.this,RegisterActivity.class));
+                        startActivity(new Intent(MainActivity.this, RegisterActivity.class));
                         break;
                     case R.id.home_destroy:
                         quitLogin();
@@ -145,17 +132,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    /** 注销 退出登录*/
-    public void quitLogin(){
-        if (null==MainApplication.loginUser)
-        {
+
+    /**
+     * 注销 退出登录
+     */
+    public void quitLogin() {
+        if (null == MainApplication.loginUser) {
             return;
         }
         new Thread(new Runnable() {
             @Override
             public void run() {
                 String content = GsonUtils.getGson().toJson(MainApplication.loginUser);
-                LoginUtils.toRequestQuitLogin(quitLoginUrl,content,MainApplication.cookie);
+                LoginUtils.toRequestQuitLogin(quitLoginUrl, content, MainApplication.cookie);
             }
         }).start();
         amatarView = (ImageView) headerView.findViewById(R.id.icon_amatar_image);
@@ -169,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setHomeAsUpIndicator(R.drawable.ic_action_main_menu_white);
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         /*设置菜单*/
@@ -178,5 +168,17 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         return true;
+    }
+
+    @OnClick({R.id.main_live_video_image_view, R.id.main_dynamic_image_view})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.main_live_video_image_view:
+                bottomSheetDialogFrag.show(getSupportFragmentManager(), "dialog");
+                break;
+            case R.id.main_dynamic_image_view:
+                startActivity(new Intent(this,DynamicActivity.class));
+                break;
+        }
     }
 }
