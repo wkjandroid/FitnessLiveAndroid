@@ -1,8 +1,11 @@
 package com.example.wkj_pc.fitnesslive.activity;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -15,19 +18,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.fragment.BottomSheetDialogFrag;
+import com.example.wkj_pc.fitnesslive.fragment.DynamicFragment;
+import com.example.wkj_pc.fitnesslive.fragment.HomePageFragment;
 import com.example.wkj_pc.fitnesslive.tools.BitmapUtils;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,18 +42,22 @@ public class MainActivity extends AppCompatActivity {
     DrawerLayout drawerLayout;
     @BindView(R.id.home_nav_view)
     NavigationView homeNavView;
-
     @BindView(R.id.main_message_btn)
     ImageView messageShowBtn;
-    @BindView(R.id.main_live_video_image_view)
-    ImageView mainLiveVideoImageView;
+    //底部导航栏
+    @BindView(R.id.home_main_change_tablayout)
+    TabLayout homeMainChangeTablayout;
+    @BindView(R.id.home_main_content_fragment)
+    LinearLayout homeMainContentFragment;
 
+    private DynamicFragment dynamicFragment;
+    private HomePageFragment homePgaeFragment;
     private View headerView;
     private ImageView amatarView;
     private TextView username;
     private TextView tishiView;
     private String quitLoginUrl;
-    private BottomSheetDialogFrag bottomSheetDialogFrag;
+    private FragmentManager fragmentManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,11 +66,60 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         initActionBar();
         initMessageReceiver();
-        //设置滑出菜单
-        bottomSheetDialogFrag = new BottomSheetDialogFrag();
-        setNavigationView();/* 将滑出页面的菜单中加入点击事件 */
+        setNavigationView();
+        fragmentManager = getFragmentManager();
+        /* 将滑出页面的菜单中加入点击事件 */
+        homeMainChangeTablayout.setSelectedTabIndicatorColor(Color.WHITE);
+        initTabLayout();
         quitLoginUrl = getResources().getString(R.string.app_destroy_url);
+
     }
+
+    //设置底部导航栏
+    private void initTabLayout() {
+        final int[] position = {0};
+        homeMainChangeTablayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 0) {
+                    position[0] = 0;
+                    toolbar.setVisibility(View.VISIBLE);
+                    if (null==homePgaeFragment)
+                        homePgaeFragment = new HomePageFragment();
+                    FragmentTransaction transaction =fragmentManager.beginTransaction();
+                    transaction.replace(R.id.home_main_content_fragment, homePgaeFragment);
+                    transaction.commit();
+                } else if (tab.getPosition() == 1) {
+                    //滑出直播和拍摄选项
+//                  if (null == MainApplication.loginUser)
+//                        startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                    new BottomSheetDialogFrag().show(getSupportFragmentManager(), "dialog");
+                    homeMainChangeTablayout.getTabAt(position[0]).select();
+                } else {
+                    position[0] = 2;
+                    toolbar.setVisibility(View.GONE);
+                    if (null==dynamicFragment)
+                        dynamicFragment = new DynamicFragment();
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+                    transaction.replace(R.id.home_main_content_fragment,dynamicFragment);
+                    transaction.commit();
+                }
+            }
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+            }
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 1) {
+                    if (null == MainApplication.loginUser)
+                        return;
+                    new BottomSheetDialogFrag().show(getSupportFragmentManager(), "dialog");
+                }
+            }
+        });
+    }
+
     /**
      * 有系统消息来到后，显示在toolbar中
      */
@@ -82,8 +140,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, SysMessageActivity.class));
             }
         });
-
     }
+
     /**
      * 处于活动界面的时候，显示登录信息
      */
@@ -147,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
                 LoginUtils.toRequestQuitLogin(quitLoginUrl, content, MainApplication.cookie);
             }
         }).start();
+        MainApplication.loginUser = null;
         amatarView = (ImageView) headerView.findViewById(R.id.icon_amatar_image);
         tishiView.setText("点击头像登录");
     }
@@ -170,15 +229,4 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @OnClick({R.id.main_live_video_image_view, R.id.main_dynamic_image_view})
-    public void onViewClicked(View view) {
-        switch (view.getId()) {
-            case R.id.main_live_video_image_view:
-                bottomSheetDialogFrag.show(getSupportFragmentManager(), "dialog");
-                break;
-            case R.id.main_dynamic_image_view:
-                startActivity(new Intent(this,DynamicActivity.class));
-                break;
-        }
-    }
 }

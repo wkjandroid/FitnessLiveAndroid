@@ -29,40 +29,47 @@
                 >
             </ImageView>
         </android.support.v7.widget.Toolbar>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"/>
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:id="@+id/home_main_content_fragment"
+            >
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/colorBlack"
+            />
+        <android.support.design.widget.TabLayout
+            android:layout_width="match_parent"
+            android:id="@+id/home_main_change_tablayout"
             android:layout_height="?attr/actionBarSize"
             android:layout_marginBottom="5dp"
-            android:orientation="horizontal">
-            <TextView
+            >
+            <android.support.design.widget.TabItem
                 android:id="@+id/home_main_page_text_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:drawableTop="@drawable/icon_home_pressed"
-                android:gravity="center"
-                android:text="@string/app_main_page"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/home_main_page_selector"
+                android:text="首页"
                  />
-            <ImageView
+            <android.support.design.widget.TabItem
                 android:id="@+id/main_live_video_image_view"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_action_zhibo_video_btn"
+                android:icon="@drawable/ic_action_zhibo_video_btn"
                 />
-            <TextView
+            <android.support.design.widget.TabItem
                 android:id="@+id/main_dynamic_image_view"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                android:drawableTop="@drawable/icon_selfinfo_normal"
+                android:icon="@drawable/home_selfinfo_selector"
                 android:gravity="center"
                 android:text="动态" />
-        </LinearLayout>
+        </android.support.design.widget.TabLayout>
     </LinearLayout>
     <!--右滑看到的页面，设置头部和下部菜单-->
     <android.support.design.widget.NavigationView

@@ -14,13 +14,10 @@ import com.example.wkj_pc.fitnesslive.activity.VideoShootActivity;
 
 public class BottomSheetDialogFrag extends BottomSheetDialogFragment {
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

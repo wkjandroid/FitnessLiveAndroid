@@ -36,6 +36,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:textSize="10sp"
+                android:textColor="@color/colorToolbar"
                 android:layout_marginTop="20dp"
                 android:text="观看人数: 4512"
                 android:id="@+id/watch_people_number"
@@ -45,6 +46,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:textSize="10sp"
+                android:textColor="@color/colorPrimary"
                 android:text="粉丝: 4512"
                 android:id="@+id/fans_people_number"
                 />
@@ -89,8 +91,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="7"
             android:layout_marginLeft="10dp"
+            android:textColor="@color/colorStroke"
             android:hint="@string/app_edit_comment_text"
-             />
+            />
 
         <ImageView
             android:layout_width="0dp"

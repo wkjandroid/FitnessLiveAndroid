@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.AttentionUserAdapter;
+import com.example.wkj_pc.fitnesslive.tools.WebSocketUtils;
 import com.github.faucamp.simplertmp.RtmpHandler;
 import com.seu.magicfilter.utils.MagicFilterType;
 
@@ -50,27 +51,30 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     private List<Integer> amatarLists=new ArrayList<>();
     private LinearLayout bottomLiveShowlinearLayout;
     private ImageView closeLiveIconBtn;
-
+    private String messageWebSocket;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        设置页面布局方向，当该window对用户可见时，让设备屏幕处于高亮（bright）状态。
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_live);
-        pushVideoStreamUrl = "rtmp://47.93.20.45:1935/live/livestreams";
-        mPublishBtn = (Button) findViewById(R.id.start_live_btn);
-        mCameraSwitchBtn = (ImageView) findViewById(R.id.swCam);
-        initAmatartLists();
-        attentionUserRcyclerView = (RecyclerView) findViewById(R.id.attention_user_show_recycler_view);
-        initRecyclerView();
-        mPublishBtn.setOnClickListener(this);
-        mCameraSwitchBtn.setOnClickListener(this);
-        mPublisher = new SrsPublisher((SrsCameraView) findViewById(R.id.live_view));
-        initPublisher();
-        closeLiveIconBtn = (ImageView) findViewById(R.id.close_live_icon);
-        closeLiveIconBtn.setOnClickListener(this);
-        bottomLiveShowlinearLayout = (LinearLayout) findViewById(R.id.begin_live_show_linearlayout);
-        initBeautySpinner();
+        messageWebSocket=getResources().getString(R.string.app_message_websocket_url_edit);
+        WebSocketUtils.getWebSocket(messageWebSocket);
+
+//        pushVideoStreamUrl = "rtmp://47.93.20.45:1935/live/livestreams";
+//        mPublishBtn = (Button) findViewById(R.id.start_live_btn);
+//        mCameraSwitchBtn = (ImageView) findViewById(R.id.swCam);
+//        initAmatartLists();
+//        attentionUserRcyclerView = (RecyclerView) findViewById(R.id.attention_user_show_recycler_view);
+//        initRecyclerView();
+//        mPublishBtn.setOnClickListener(this);
+//        mCameraSwitchBtn.setOnClickListener(this);
+//        mPublisher = new SrsPublisher((SrsCameraView) findViewById(R.id.live_view));
+//        initPublisher();
+//        closeLiveIconBtn = (ImageView) findViewById(R.id.close_live_icon);
+//        closeLiveIconBtn.setOnClickListener(this);
+//        bottomLiveShowlinearLayout = (LinearLayout) findViewById(R.id.begin_live_show_linearlayout);
+//        initBeautySpinner();
     }
     private void initAmatartLists() {
         for (int i=0 ;i<10;i++){
