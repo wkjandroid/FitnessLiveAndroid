@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
@@ -20,6 +24,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
@@ -58,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tishiView;
     private String quitLoginUrl;
     private FragmentManager fragmentManager;
-
+    private int position = 0;   //底部导航栏选中角标
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,16 +79,15 @@ public class MainActivity extends AppCompatActivity {
         quitLoginUrl = getResources().getString(R.string.app_destroy_url);
 
     }
-
     //设置底部导航栏
     private void initTabLayout() {
-        final int[] position = {0};
+
         homeMainChangeTablayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 if (tab.getPosition() == 0) {
-                    position[0] = 0;
+                    position = 0;
                     toolbar.setVisibility(View.VISIBLE);
                     if (null==homePgaeFragment)
                         homePgaeFragment = new HomePageFragment();
@@ -92,12 +96,15 @@ public class MainActivity extends AppCompatActivity {
                     transaction.commit();
                 } else if (tab.getPosition() == 1) {
                     //滑出直播和拍摄选项
-//                  if (null == MainApplication.loginUser)
-//                        startActivity(new Intent(MainActivity.this,LoginActivity.class));
-                    new BottomSheetDialogFrag().show(getSupportFragmentManager(), "dialog");
-                    homeMainChangeTablayout.getTabAt(position[0]).select();
+                      if (null == MainApplication.loginUser)
+                      {
+                          startActivity(new Intent(MainActivity.this,LoginActivity.class));
+                          return;
+                      }
+                      new BottomSheetDialogFrag().show(getSupportFragmentManager(), "dialog");
+                      homeMainChangeTablayout.getTabAt(position).select();
                 } else {
-                    position[0] = 2;
+                    position = 2;
                     toolbar.setVisibility(View.GONE);
                     if (null==dynamicFragment)
                         dynamicFragment = new DynamicFragment();
@@ -147,10 +154,15 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onResume() {
+        //显示登录用户信息
         if (null != MainApplication.loginUser) {
-            Glide.with(this).load(MainApplication.loginUser.getAmatar()).asBitmap().into(amatarView);
+            if (null!=MainApplication.loginUser.getAmatar()){
+                Glide.with(this).load(MainApplication.loginUser.getAmatar()).asBitmap().into(amatarView);
+            }
             tishiView.setText(MainApplication.loginUser.getNickname());
         }
+        //设置底部导航栏，弹出选则框退出后设置首页为选中项。
+        homeMainChangeTablayout.getTabAt(position).select();
         super.onResume();
     }
 
@@ -174,15 +186,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
-                    case R.id.home_settings:
+                    case R.id.home_user_settings:
                         drawerLayout.closeDrawers();
                         startActivity(new Intent(MainActivity.this, LoginActivity.class));
                         break;
-                    case R.id.home_register:
+                    case R.id.home_user_register:
                         drawerLayout.closeDrawers();
                         startActivity(new Intent(MainActivity.this, RegisterActivity.class));
                         break;
-                    case R.id.home_destroy:
+                    case R.id.home_user_destroy:
+                        //用户注销
+                        drawerLayout.closeDrawers();
                         quitLogin();
                         break;
                 }
@@ -195,9 +209,8 @@ public class MainActivity extends AppCompatActivity {
      * 注销 退出登录
      */
     public void quitLogin() {
-        if (null == MainApplication.loginUser) {
+        if (null == MainApplication.loginUser)
             return;
-        }
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -205,9 +218,11 @@ public class MainActivity extends AppCompatActivity {
                 LoginUtils.toRequestQuitLogin(quitLoginUrl, content, MainApplication.cookie);
             }
         }).start();
-        MainApplication.loginUser = null;
+
         amatarView = (ImageView) headerView.findViewById(R.id.icon_amatar_image);
+        amatarView.setImageResource(R.drawable.head_img);
         tishiView.setText("点击头像登录");
+        MainApplication.loginUser = null;
     }
 
     private void initActionBar() {

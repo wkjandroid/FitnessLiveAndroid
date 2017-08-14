@@ -10,11 +10,10 @@ import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.os.UserManagerCompatApi24;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.InputFilter;
 import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,10 +29,8 @@ import com.example.wkj_pc.fitnesslive.service.LoginService;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LogUtils;
 import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
-import com.google.gson.Gson;
 import com.mancj.slideup.SlideUp;
 import com.sina.weibo.sdk.WbSdk;
-import com.sina.weibo.sdk.auth.AccessTokenKeeper;
 import com.sina.weibo.sdk.auth.AuthInfo;
 import com.sina.weibo.sdk.auth.Oauth2AccessToken;
 import com.sina.weibo.sdk.auth.WbAuthListener;
@@ -109,6 +106,7 @@ public class LoginActivity extends AppCompatActivity {
     };
     private SsoHandler mSsoHandler;
     private Oauth2AccessToken accessToken;
+    private String loginType="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +122,7 @@ public class LoginActivity extends AppCompatActivity {
     }
     /** 响应微博图片点击登录 */
     public void weboLogin(View view){
+        loginType="weibo";
         AuthInfo mAuthInfo = new AuthInfo(this, com.example.wkj_pc.fitnesslive.weiboapi.Constants.APP_KEY,
                 com.example.wkj_pc.fitnesslive.weiboapi.Constants.REDIRECT_URL,
                 com.example.wkj_pc.fitnesslive.weiboapi.Constants.SCOPE);
@@ -138,64 +137,62 @@ public class LoginActivity extends AppCompatActivity {
 /** 微博认证监听类 */
     class MyWiboAuthListener implements WbAuthListener{
 
-    @Override
-    public void onSuccess(Oauth2AccessToken oauth2AccessToken) {
+        @Override
+        public void onSuccess(Oauth2AccessToken oauth2AccessToken) {
 
-        if (oauth2AccessToken.isSessionValid()) {
-            user=new User();
-            user.setToken("wb:"+oauth2AccessToken.getToken());
-            user.setPhonenum(oauth2AccessToken.getPhoneNum());
-            String uid = oauth2AccessToken.getUid();
-            user.setAccount(uid);
-            /** 获取认证成功者的用户信息，然后，请求服务器 */
-            String getUserInfoUrl="https://api.weibo.com/2/users/show.json?access_token="+oauth2AccessToken.getToken()
-                    +"&uid="+uid;
-            LoginUtils.getUserInfoWithWeibo(getUserInfoUrl, new Callback() {
-                @Override
-                public void onFailure(Call call, IOException e) {
-                    LogUtils.logDebug("LoginActivity","--------"+"shibia");
-                }
-                @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    if (response.isSuccessful()){
-                        String responseDate = response.body().string();
-                        try {
-                            JSONObject jsonObject=new JSONObject(responseDate);
-                            user.setNickname(jsonObject.getString("screen_name"));
-                            user.setName(jsonObject.getString("name"));
-                            user.setAmatar(jsonObject.getString("avatar_large"));
-                            String gender = jsonObject.getString("gender");
-                            if (gender.equals("m")){
-                                gender="男";
-                            }else {
-                                gender="女";
-                            }
-                            user.setGender(gender);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        doLogin();//访问后台服务器
-                    }else {
-                        Toast.makeText(LoginActivity.this, "登录失败！", Toast.LENGTH_SHORT).show();
+            if (oauth2AccessToken.isSessionValid()) {
+                user=new User();
+                user.setToken("wb:"+oauth2AccessToken.getToken());
+                user.setPhonenum(oauth2AccessToken.getPhoneNum());
+                String uid = oauth2AccessToken.getUid();
+                user.setAccount(uid);
+                /** 获取认证成功者的用户信息，然后，请求服务器 */
+                String getUserInfoUrl="https://api.weibo.com/2/users/show.json?access_token="+oauth2AccessToken.getToken()
+                        +"&uid="+uid;
+                LoginUtils.getUserInfoWithWeibo(getUserInfoUrl, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        LogUtils.logDebug("LoginActivity","--------"+"shibia");
                     }
-                }
-            });
-
-        }else {
-            Toast.makeText(LoginActivity.this,"登录失败！",Toast.LENGTH_SHORT).show();
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        if (response.isSuccessful()){
+                            String responseDate = response.body().string();
+                            try {
+                                JSONObject jsonObject=new JSONObject(responseDate);
+                                user.setNickname(jsonObject.getString("screen_name"));
+                                user.setName(jsonObject.getString("name"));
+                                user.setAmatar(jsonObject.getString("avatar_large"));
+                                String gender = jsonObject.getString("gender");
+                                if (gender.equals("m")){
+                                    gender="男";
+                                }else {
+                                    gender="女";
+                                }
+                                user.setGender(gender);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            doLogin();//访问后台服务器
+                        }else {
+                            Toast.makeText(LoginActivity.this, "登录失败！", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                 });
+            }else {
+                Toast.makeText(LoginActivity.this,"登录失败！",Toast.LENGTH_SHORT).show();
+            }
         }
-
+        @Override
+        public void cancel() {
+            Toast.makeText(LoginActivity.this,
+                    "取消认证！", Toast.LENGTH_LONG).show();
+        }
+        @Override
+        public void onFailure(WbConnectErrorMessage wbConnectErrorMessage) {
+            Toast.makeText(LoginActivity.this, wbConnectErrorMessage.getErrorMessage(), Toast.LENGTH_LONG).show();
+        }
     }
-    @Override
-    public void cancel() {
-        Toast.makeText(LoginActivity.this,
-                "取消认证！", Toast.LENGTH_LONG).show();
-    }
-    @Override
-    public void onFailure(WbConnectErrorMessage wbConnectErrorMessage) {
-        Toast.makeText(LoginActivity.this, wbConnectErrorMessage.getErrorMessage(), Toast.LENGTH_LONG).show();
-    }
-}
 
     /**
      *    响应微信图片点击进行登录
@@ -213,7 +210,6 @@ public class LoginActivity extends AppCompatActivity {
     }
     /** 获取微信登录信息 */
     public void getUserInfoWithWechat(){
-
     }
 
     /** 获取qq登录用户信息*/
@@ -246,6 +242,9 @@ public class LoginActivity extends AppCompatActivity {
     }
     /** 访问后台服务器 */
     public void doLogin(){
+
+        if (checkNetwork()) return; //如果网络不可用的话，直接返回
+
         final String cookies = cookieSp.getString("cookie",null);
         String userinfo = GsonUtils.getGson().toJson(user);
         LoginUtils.toRequestServerForLogin(loginUrl, userinfo, cookies, new Callback() {
@@ -278,6 +277,21 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+    //如果当前网络不可用的话，停止登录活动
+    private boolean checkNetwork() {
+        if (!MainApplication.networkinfo) {
+           AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setIcon(R.mipmap.ic_begin_live_icon)
+                    .setCancelable(true)
+                    .setPositiveButton("确定", null)
+                    .setTitle("提醒")
+                    .setMessage("网络状态异常！")
+                    .create();
+            dialog.show();
+            return true;
+        }
+        return false;
     }
 
     /* qq登录需要使用的内部类，即监听器，监听登录情况并反馈！ */
@@ -319,6 +333,7 @@ public class LoginActivity extends AppCompatActivity {
     /* 响应qq图片点击进行登录 */
     public void qqLogin(View view)
     {
+        loginType="qq";
         /*进行权限请求*/
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE)!=
                     PackageManager.PERMISSION_GRANTED) {
@@ -352,24 +367,33 @@ public class LoginActivity extends AppCompatActivity {
     {
         startActivity(new Intent(this,RegisterActivity.class));
     }
+
+
     /** 账号登录 */
     public void toLogin(View view){
-        if (TextUtils.isEmpty(editAccount.getText().toString())){
+
+        loginType="account";
+        if (TextUtils.isEmpty(editAccount.getText().toString().trim())){
             editAccount.setError("账号不能为空！");
             return;
-        }else if (TextUtils.isEmpty(editPassword.getText().toString())){
+        }else if (TextUtils.isEmpty(editPassword.getText().toString().trim())){
             editPassword.setError("密码不能为空！");
             return;
         }
+        if (checkNetwork())
+            return;
+
         final User loginUser=new User();
         loginUser.setAccount(editAccount.getText().toString());
         loginUser.setPassword(editPassword.getText().toString());
+        loginUser.setToken("account");
         String loginInfo = GsonUtils.getGson().toJson(loginUser);
-        /** 将cookie存储到sp中，以便进入同一个会话中*/
+        // 将cookie存储到sp中，以便进入同一个会话中
         final String cookies = cookieSp.getString("cookie", null);
         LoginUtils.toRequestServerForLogin(loginUrl, loginInfo, cookies, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
                 Message message = handler.obtainMessage();
                 message.what=LOGINFAILED;
                 handler.sendMessage(message);
@@ -384,14 +408,31 @@ public class LoginActivity extends AppCompatActivity {
                     }
                     String responseData=response.body().string();
                     if (responseData.equals("error")){
-                        editAccount.setError("账号或密码错误！");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                editAccount.setError("账号或密码错误！");
+                            }
+                        });
+
                     }else if (responseData.equals("none")){
-                        editAccount.setError("账号不存在！");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                editAccount.setError("账号不存在！");
+                            }
+                        });
                     }else {
-                        User user = GsonUtils.getGson().fromJson(responseData, User.class);
-                        MainApplication.loginUser=user;
-                        startActivity(new Intent(LoginActivity.this,MainActivity.class));
-                        finish();
+                        try {
+                            User user = GsonUtils.getGson().fromJson(responseData, User.class);
+                            MainApplication.loginUser=user;
+                            startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                            finish();
+                        }catch (Exception e){
+                            Message message = handler.obtainMessage();
+                            message.what=LOGINFAILED;
+                            handler.sendMessage(message);
+                        }
                     }
                 }else {
                     Message message = handler.obtainMessage();
@@ -476,7 +517,9 @@ public class LoginActivity extends AppCompatActivity {
     /*处理qq登录返回的activity结果*/
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Tencent.onActivityResultData(requestCode,resultCode,data,listener);
+        if (loginType!="weibo"){
+            Tencent.onActivityResultData(requestCode,resultCode,data,listener);
+        }
         super.onActivityResult(requestCode, resultCode, data);
         if (mSsoHandler != null) {
             mSsoHandler.authorizeCallBack(requestCode, resultCode, data);

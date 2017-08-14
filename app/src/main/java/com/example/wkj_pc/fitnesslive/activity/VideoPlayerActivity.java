@@ -59,7 +59,7 @@ public class VideoPlayerActivity extends AppCompatActivity {
         watchVideoView.setBufferSize(1024);
         watchVideoView.setVideoQuality(View.DRAWING_CACHE_QUALITY_AUTO);
         watchVideoView.setHardwareDecoder(true);
-        path = getResources().getString(R.string.app_video_upload_url_edit);
+        path = getResources().getString(R.string.app_video_upload_srs_server_url);
         initAmatarLists();
         initAttentionUserShowRecyclerView();
     }

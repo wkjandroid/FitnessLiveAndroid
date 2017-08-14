@@ -20,7 +20,7 @@ public class LoginUtils {
     }
 
     public static void toRequestServerForLogin(String requestUrl, String userinfo, String cookie, Callback callback) {
-        Request request;
+        Request request=null;
         RequestBody body=new FormBody.Builder()
                 .add("user",userinfo).build();
         if (null == cookie) {
@@ -43,7 +43,7 @@ public class LoginUtils {
         Request request=new Request.Builder().url(requestUrl)
                 .post(body).addHeader("cookie",cookie).build();
         try {
-            Response response = OkHttpClientFactory.getOkHttpClientInstance().newCall(request).execute();
+            OkHttpClientFactory.getOkHttpClientInstance().newCall(request).execute();
         } catch (IOException e) {
             e.printStackTrace();
         }

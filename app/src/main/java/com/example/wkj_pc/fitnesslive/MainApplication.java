@@ -2,8 +2,9 @@ package com.example.wkj_pc.fitnesslive;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.IntentFilter;
 import com.example.wkj_pc.fitnesslive.po.User;
-import com.example.wkj_pc.fitnesslive.tools.LogUtils;
+import com.example.wkj_pc.fitnesslive.receiver.NetWorkReceiver;
 
 import org.litepal.LitePal;
 
@@ -14,12 +15,16 @@ import org.litepal.LitePal;
 public class MainApplication extends Application {
     public static String cookie;
     public static User loginUser;   //普通用户的登录信息
-
+    public static Boolean networkinfo;  //网络状态情况
+    private NetWorkReceiver netWorkReceiver=new NetWorkReceiver();
     @Override
     public void onCreate() {
         super.onCreate();
         LitePal.initialize(getApplicationContext());
         LitePal.getDatabase();
+        //注册网络广播监听事件
+        IntentFilter filter=new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(netWorkReceiver,filter);
     }
 
     public static Context getContext(){

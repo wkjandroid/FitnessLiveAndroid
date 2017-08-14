@@ -77,47 +77,58 @@
         android:background="@mipmap/ic_begin_live_icon"
         android:layout_centerInParent="true"
         />
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
         android:id="@+id/begin_live_show_linearlayout"
         android:layout_marginBottom="10dp"
         android:visibility="gone"
+        android:layout_alignParentBottom="true"
         android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="7"
-            android:layout_marginLeft="10dp"
-            android:textColor="@color/colorStroke"
-            android:hint="@string/app_edit_comment_text"
-            />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginRight="20dp"
-            android:src="@mipmap/ic_send_comment_message_icon"
-            />
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
-            android:id="@+id/swCam"
-            android:background="@mipmap/ic_change_video_camera_img_btn"
-            />
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_marginRight="10dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/close_live_icon"
-            android:src="@mipmap/ic_close_live_icon"
-            />
+        <!--聊天信息展示-->
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:id="@+id/live_chatting_message_recycler_view"
+            >
+        </android.support.v7.widget.RecyclerView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/editText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:layout_marginLeft="10dp"
+                android:textColor="@color/colorStroke"
+                android:hint="@string/app_edit_comment_text"
+                />
+            <ImageView
+                android:onClick="sendLiveChattingMessage"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginRight="20dp"
+                android:src="@mipmap/ic_send_comment_message_icon"
+                />
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:id="@+id/swCam"
+                android:background="@mipmap/ic_change_video_camera_img_btn"
+                />
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginRight="10dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/close_live_icon"
+                android:src="@mipmap/ic_close_live_icon"
+                />
+        </LinearLayout>
     </LinearLayout>
-
 </RelativeLayout>
