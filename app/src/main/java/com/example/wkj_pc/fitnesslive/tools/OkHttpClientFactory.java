@@ -20,7 +20,7 @@ public class OkHttpClientFactory {
     }
     public static OkHttpClient getOkHttpClientInstance(){
         if (null==client)
-            new OkHttpClientFactory();
+                new OkHttpClientFactory();
         return client;
     }
 }

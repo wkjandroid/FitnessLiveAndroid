@@ -14,11 +14,10 @@
     <string name="app_exit">退出</string>
     <string name="app_dark_mode">夜间模式</string>
     <string name="app_day_mode">白天模式</string>
-    <string name="app_login_url">http://www.wkjandroid.wang/customer/login/toLogin</string>
+    <string name="app_login_url">http://172.18.163.108/customer/login/toLogin</string>
     <string name="app_longrequest_url">http://www.wkjandroid.wang/</string>
     <string name="app_destroy_url">http://www.wkjandroid.wang/customer/login/quitLogin</string>
     <string name="app_video_upload_srs_server_url">rtmp://47.93.20.45:1935/live/livestreams</string>
     <string name="app_message_websocket_url_edit">ws://172.18.163.108/websocket/</string>
     <string name="app_edit_comment_text">请输入信息</string>
-
 </resources>

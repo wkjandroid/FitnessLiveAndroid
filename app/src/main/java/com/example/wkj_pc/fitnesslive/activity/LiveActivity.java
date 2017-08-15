@@ -23,7 +23,9 @@ import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.AttentionUserAdapter;
 import com.example.wkj_pc.fitnesslive.po.LiveChattingMessage;
-import com.example.wkj_pc.fitnesslive.tools.WebSocketUtils;
+import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
+import com.example.wkj_pc.fitnesslive.tools.LogUtils;
+import com.example.wkj_pc.fitnesslive.tools.OkHttpClientFactory;
 import com.github.faucamp.simplertmp.RtmpHandler;
 import com.seu.magicfilter.utils.MagicFilterType;
 import net.ossrs.yasea.SrsCameraView;
@@ -36,8 +38,14 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 
 
 public class LiveActivity extends AppCompatActivity implements View.OnClickListener {
@@ -76,10 +84,10 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     private List<Integer> amatarLists = new ArrayList<>();  //观看者头像集合
     private String messageWebSocketUrl; //直播聊天传输地址
     private SrsPublisher mPublisher;       //直播推流发着者
-
-    public static List<LiveChattingMessage> liveMessages = new ArrayList<>();//直播聊天信息
+    private WebSocket baseWebSocket; //聊天用websocket
+    public  List<LiveChattingMessage> liveMessages = new ArrayList<>();//直播聊天信息
     private LiveChattingMessageAdapter adapter;
-
+    private LiveChattingMessage message;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,8 +97,8 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.bind(this);
         /* 获取websocket地址，设置聊天*/
         messageWebSocketUrl = getResources().getString(R.string.app_message_websocket_url_edit) +
-                MainApplication.loginUser.getAccount()+"/" + MainApplication.loginUser.getAccount()+"/live";
-        WebSocketUtils.getWebSocket(messageWebSocketUrl);
+                MainApplication.loginUser.getNickname()+"/" + MainApplication.loginUser.getNickname()+"/live";
+        getWebSocket(messageWebSocketUrl);  //不用开启子线程,自己开启线程
         /*设置直播推流地址*/
         pushVideoStreamUrl = getResources().getString(R.string.app_video_upload_srs_server_url);
         mPublisher = new SrsPublisher((SrsCameraView) findViewById(R.id.live_view));
@@ -326,13 +334,18 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
         final LiveChattingMessage sendMsg=new LiveChattingMessage();
-        sendMsg.setFrom(MainApplication.loginUser.getAccount());
+        sendMsg.setFrom(MainApplication.loginUser.getNickname());
         sendMsg.setContent(editTextMsg);
         sendMsg.setTo("server");
-        sendMsg.setMid(1);
+        sendMsg.setMid(0);
         SimpleDateFormat format=new SimpleDateFormat("HH:mm:ss");
         sendMsg.setTime(format.format(new Date()));
-        //WebSocketUtils.baseWebSocket.send( GsonUtils.getGson().toJson(sendMsg));
+        if (null!=baseWebSocket){
+            baseWebSocket.send( GsonUtils.getGson().toJson(sendMsg));
+        }else{
+           getWebSocket(messageWebSocketUrl);
+           baseWebSocket.send( GsonUtils.getGson().toJson(sendMsg));
+        }
         editText.setText("");
     }
     @Override
@@ -361,5 +374,90 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             mPublisher.startEncode();
         }
         mPublisher.startCamera();
+    }
+/* 直播间聊天websocket*/
+    public void getWebSocket(String address){
+        System.out.println("WebSocketUtils client start");
+        Request request=new Request.Builder().url(address)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newWebSocket(request, new WebSocketListener() {
+            @Override
+            public void onOpen(WebSocket webSocket, Response response) {
+                super.onOpen(webSocket, response);
+                baseWebSocket=webSocket;
+                sendPingToServer();
+                System.out.println("WebSocketUtils client onOpen\"+\"client request header:\" + response.request().headers()\n" +
+                        "                +\"client response header:\" + response.headers()+\"client response:\" + response");
+                LogUtils.logDebug("WebSocketUtils","client onOpen"+"client request header:" + response.request().headers()
+                        +"client response header:" + response.headers()+"client response:" + response);
+            }
+            @Override
+            public void onMessage(WebSocket webSocket, String text) {
+                super.onMessage(webSocket, text);
+                LogUtils.logDebug("WebSocketUtils","text"+text);
+                if (text==null || text=="" ){
+                    return;
+                }
+                if (text.contentEquals("success")){
+                    LiveChattingMessage message=new LiveChattingMessage();
+                    message.setMid(0);
+                    message.setFrom(MainApplication.loginUser.getNickname());
+                    message.setTo("server");
+                    message.setContent("来到直播间！");
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd:HH/mm/SS");
+                    message.setTime(format.format(new Date()));
+                    webSocket.send( GsonUtils.getGson().toJson(message));
+                }else{
+                    try{
+                        message = GsonUtils.getGson().fromJson(text, LiveChattingMessage.class);
+                        liveMessages.add(message);
+                        System.out.println("ggggggggggggg"+message.getFrom()+message.toString());
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                adapter.notifyItemInserted(liveMessages.size()-1);
+                                liveChattingMessageRecyclerView.scrollToPosition(liveMessages.size()-1);
+                            }
+                        });
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+            @Override
+            public void onClosing(WebSocket webSocket, int code, String reason) {
+                super.onClosing(webSocket, code, reason);
+                baseWebSocket=null;
+                LogUtils.logDebug("WebSocketUtils","client onClosing"+"code:" + code + " reason:" + reason);
+                System.out.println("WebSocketUtils"+"client onClosing"+"code:" + code + " reason:" + reason);
+            }
+            @Override
+            public void onClosed(WebSocket webSocket, int code, String reason) {
+                super.onClosed(webSocket, code, reason);
+                baseWebSocket=null;
+                LogUtils.logDebug("webSocketUtils","client onClosed"+"code:" + code + " reason:" + reason);
+                System.out.println("webSocketUtils"+"client onClosed"+"code:" + code + " reason:" + reason);
+            }
+            @Override
+            public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+                super.onFailure(webSocket, t, response);
+                baseWebSocket=null;
+                //出现异常会进入此回调
+                LogUtils.logDebug("WebSocketUtils","client onFailure"+"throwable:" + t);
+                System.out.println("WebSocketUtils"+"client onFailure"+"throwable:" + t);
+            }
+        });
+    };
+    //设置心跳防止websocket断线
+    public void sendPingToServer(){
+        Timer timer=new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (null!=baseWebSocket){
+                    baseWebSocket.send("");
+                }
+            }
+        },0,3000);
     }
 }
