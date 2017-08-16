@@ -19,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.AttentionUserAdapter;
@@ -56,12 +58,9 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             ImageView loginLiveLogo;
     @BindView(R.id.watch_people_number) //观看直播人数
             TextView watchPeopleNumber;
-    @BindView(R.id.fans_people_number)  //粉丝数量
-            TextView fansPeopleNumber;
+
     @BindView(R.id.attention_user_show_recycler_view)   //观众的logo
             RecyclerView attentionUserRcyclerView;
-    @BindView(R.id.below_linearlayout)  //下面的布局
-            LinearLayout belowLinearlayout;
     @BindView(R.id.change_beauty_spinner)   //改变滤镜
             Spinner changeBeautySpinner;
     @BindView(R.id.start_live_btn)      //开始直播按钮
@@ -88,6 +87,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     public  List<LiveChattingMessage> liveMessages = new ArrayList<>();//直播聊天信息
     private LiveChattingMessageAdapter adapter;
     private LiveChattingMessage message;
+    private TextView fansPeopleNumber;//粉丝数量
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,12 +96,17 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_live);
         ButterKnife.bind(this);
         /* 获取websocket地址，设置聊天*/
+        fansPeopleNumber= (TextView) findViewById(R.id.fans_people_number);
         messageWebSocketUrl = getResources().getString(R.string.app_message_websocket_url_edit) +
                 MainApplication.loginUser.getNickname()+"/" + MainApplication.loginUser.getNickname()+"/live";
         getWebSocket(messageWebSocketUrl);  //不用开启子线程,自己开启线程
         /*设置直播推流地址*/
         pushVideoStreamUrl = getResources().getString(R.string.app_video_upload_srs_server_url);
         mPublisher = new SrsPublisher((SrsCameraView) findViewById(R.id.live_view));
+        if (null!=MainApplication.loginUser.getAmatar()){
+            Glide.with(this).load(MainApplication.loginUser.getAmatar()).asBitmap().into(loginLiveLogo);
+        }
+        loginLiveLogo.setImageResource(R.mipmap.ic_launcher);
         initAmatartLists();
         /*设置观看者横向显示*/
         initAmatartRecyclerView();
@@ -121,13 +126,14 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    /* 设置观看者头像显示 */
+    /* 设置观众和直播员头像显示 */
     private void initAmatartRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
         attentionUserRcyclerView.setLayoutManager(layoutManager);
         AttentionUserAdapter adapter = new AttentionUserAdapter(amatarLists);
         attentionUserRcyclerView.setAdapter(adapter);
+
     }
 
     /*设置直播聊天信息展示*/
@@ -338,6 +344,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         sendMsg.setContent(editTextMsg);
         sendMsg.setTo("server");
         sendMsg.setMid(0);
+        sendMsg.setIntent(1);
         SimpleDateFormat format=new SimpleDateFormat("HH:mm:ss");
         sendMsg.setTime(format.format(new Date()));
         if (null!=baseWebSocket){
@@ -395,33 +402,48 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             public void onMessage(WebSocket webSocket, String text) {
                 super.onMessage(webSocket, text);
                 LogUtils.logDebug("WebSocketUtils","text"+text);
-                if (text==null || text=="" ){
-                    return;
-                }
-                if (text.contentEquals("success")){
-                    LiveChattingMessage message=new LiveChattingMessage();
-                    message.setMid(0);
-                    message.setFrom(MainApplication.loginUser.getNickname());
-                    message.setTo("server");
-                    message.setContent("来到直播间！");
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd:HH/mm/SS");
-                    message.setTime(format.format(new Date()));
-                    webSocket.send( GsonUtils.getGson().toJson(message));
-                }else{
-                    try{
-                        message = GsonUtils.getGson().fromJson(text, LiveChattingMessage.class);
-                        liveMessages.add(message);
-                        System.out.println("ggggggggggggg"+message.getFrom()+message.toString());
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                adapter.notifyItemInserted(liveMessages.size()-1);
-                                liveChattingMessageRecyclerView.scrollToPosition(liveMessages.size()-1);
+                System.out.println("----------"+text);
+               /*处理收到的信息*/
+                if (text!=null && text!="" )
+                {
+                    /*如果返回信息为success，表示websocket连接建立成功，发送提示信息*/
+                    if (text.contentEquals("success")){
+                        LiveChattingMessage message=new LiveChattingMessage();
+                        message.setMid(0);
+                        message.setFrom(MainApplication.loginUser.getNickname());
+                        message.setTo("server");
+                        message.setContent("来到直播间！");
+                        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd:HH/mm/SS");
+                        message.setTime(format.format(new Date()));
+                        message.setIntent(1);
+                        webSocket.send( GsonUtils.getGson().toJson(message));
+                    }else {
+                        try{
+                            message = GsonUtils.getGson().fromJson(text, LiveChattingMessage.class);
+                            if (message.getIntent()==1){    //聊天
+                                liveMessages.add(message);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        adapter.notifyItemInserted(liveMessages.size()-1);
+                                        liveChattingMessageRecyclerView.scrollToPosition(liveMessages.size()-1);
+                                    }
+                                });
+                            }else if (message.getIntent()==2){  //粉丝
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        fansPeopleNumber.setText("粉丝数:"+message.getFansnumber());
+                                    }
+                                });
+                            }else if (message.getIntent()==3) {   //当前在线人数
+
                             }
-                        });
-                    }catch (Exception e){
-                        e.printStackTrace();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
+                } else{ //收到信息为空时，获取 /*如果收到信息为空，则返回不处理*/
                 }
             }
             @Override

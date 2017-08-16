@@ -13,6 +13,25 @@ public class LiveChattingMessage {
     private String to;
     private String content;
     private String time;
+    private int fansnumber;
+    private int intent;     //意图    1：代表聊天  2代表粉丝   3代表当前在线人数
+    private boolean result; //处理返回结果
+
+    public int getFansnumber() {
+        return fansnumber;
+    }
+
+    public void setFansnumber(int fansnumber) {
+        this.fansnumber = fansnumber;
+    }
+
+    public boolean isResult() {
+        return result;
+    }
+
+    public void setResult(boolean result) {
+        this.result = result;
+    }
 
     public int getMid() {
         return mid;
@@ -52,5 +71,13 @@ public class LiveChattingMessage {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public int getIntent() {
+        return intent;
+    }
+
+    public void setIntent(int intent) {
+        this.intent = intent;
     }
 }
