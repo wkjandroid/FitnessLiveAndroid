@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -26,9 +25,11 @@ import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.po.User;
 import com.example.wkj_pc.fitnesslive.service.LoginService;
+import com.example.wkj_pc.fitnesslive.tools.AlertDialogTools;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LogUtils;
 import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
+import com.example.wkj_pc.fitnesslive.tools.ToastUtils;
 import com.mancj.slideup.SlideUp;
 import com.sina.weibo.sdk.WbSdk;
 import com.sina.weibo.sdk.auth.AuthInfo;
@@ -99,7 +100,7 @@ public class LoginActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
            switch (msg.what){
                case LOGINFAILED:
-                   Toast.makeText(LoginActivity.this, "登录失败！", Toast.LENGTH_SHORT).show();
+                   ToastUtils.showToast(LoginActivity.this, "登录失败！", Toast.LENGTH_SHORT);
                    break;
            }
         }
@@ -175,22 +176,22 @@ public class LoginActivity extends AppCompatActivity {
                             }
                             doLogin();//访问后台服务器
                         }else {
-                            Toast.makeText(LoginActivity.this, "登录失败！", Toast.LENGTH_SHORT).show();
+                            ToastUtils.showToast(LoginActivity.this, "登录失败！", Toast.LENGTH_SHORT);
                         }
                     }
                  });
             }else {
-                Toast.makeText(LoginActivity.this,"登录失败！",Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(LoginActivity.this,"登录失败！",Toast.LENGTH_SHORT);
             }
         }
         @Override
         public void cancel() {
-            Toast.makeText(LoginActivity.this,
-                    "取消认证！", Toast.LENGTH_LONG).show();
+            ToastUtils.showToast(LoginActivity.this,
+                    "取消认证！", Toast.LENGTH_LONG);
         }
         @Override
         public void onFailure(WbConnectErrorMessage wbConnectErrorMessage) {
-            Toast.makeText(LoginActivity.this, wbConnectErrorMessage.getErrorMessage(), Toast.LENGTH_LONG).show();
+            ToastUtils.showToast(LoginActivity.this, wbConnectErrorMessage.getErrorMessage(), Toast.LENGTH_LONG);
         }
     }
 
@@ -200,7 +201,7 @@ public class LoginActivity extends AppCompatActivity {
     public void wechatLogin(View view){
         IWXAPI wxapi = WXAPIFactory.createWXAPI(this, APPID, true);
         if (!wxapi.isWXAppInstalled()) {
-            Toast.makeText(this, "您还未安装微信客户端", Toast.LENGTH_SHORT).show();
+            ToastUtils.showToast(this, "您还未安装微信客户端", Toast.LENGTH_SHORT);
             return;
         }
         final SendAuth.Req req = new SendAuth.Req();
@@ -225,7 +226,7 @@ public class LoginActivity extends AppCompatActivity {
                         user.setGender(object.getString("gender"));
                         user.setAmatar(object.getString("figureurl_qq_1"));
                     }else {
-                        Toast.makeText(LoginActivity.this, "登录失败！", Toast.LENGTH_SHORT).show();
+                        ToastUtils.showToast(LoginActivity.this, "登录失败！", Toast.LENGTH_SHORT);
                     }
                     doLogin();
                 }catch (Exception e){
@@ -243,8 +244,10 @@ public class LoginActivity extends AppCompatActivity {
     /** 访问后台服务器 */
     public void doLogin(){
 
-        if (checkNetwork()) return; //如果网络不可用的话，直接返回
-
+        if (!MainApplication.networkinfo){   //如果当前网络不可用的话，停止登录活动
+            AlertDialogTools.showDialog(this,R.mipmap.ic_begin_live_icon,true,"确定",null,"提醒","网络状态异常！");
+            return;
+        }
         final String cookies = cookieSp.getString("cookie",null);
         String userinfo = GsonUtils.getGson().toJson(user);
         LoginUtils.toRequestServerForLogin(loginUrl, userinfo, cookies, new Callback() {
@@ -263,48 +266,33 @@ public class LoginActivity extends AppCompatActivity {
                         MainApplication.cookie=cookie;
                     }
                     String responseData=response.body().string();
-                    LogUtils.logDebug("LoginActivity-result",responseData);
-                    if (responseData.equals("true")){
+                    try {
+                        User user = GsonUtils.getGson().fromJson(responseData, User.class);
                         MainApplication.loginUser=user;
                         startService(new Intent(LoginActivity.this, LoginService.class));
-                        startActivity(new Intent(LoginActivity.this,MainActivity.class));
                         finish();
-                    }else {
-                        Message obtain = Message.obtain();
-                        obtain.what=LOGINFAILED;
-                        handler.sendMessage(obtain);
+                    }catch (Exception e) {
+                        Message message = handler.obtainMessage();
+                        message.what = LOGINFAILED;
+                        handler.sendMessage(message);
                     }
                 }
             }
         });
     }
-    //如果当前网络不可用的话，停止登录活动
-    private boolean checkNetwork() {
-        if (!MainApplication.networkinfo) {
-           AlertDialog dialog = new AlertDialog.Builder(this)
-                    .setIcon(R.mipmap.ic_begin_live_icon)
-                    .setCancelable(true)
-                    .setPositiveButton("确定", null)
-                    .setTitle("提醒")
-                    .setMessage("网络状态异常！")
-                    .create();
-            dialog.show();
-            return true;
-        }
-        return false;
-    }
+
 
     /* qq登录需要使用的内部类，即监听器，监听登录情况并反馈！ */
     public IUiListener listener=new IUiListener() {
         @Override
         public void onComplete(Object o) {
             if (null==o ){
-                Toast.makeText(LoginActivity.this,"登录失败！",Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(LoginActivity.this,"登录失败！",Toast.LENGTH_SHORT);
                 return;
             }
             JSONObject object=(JSONObject)o;
             if (object.length()==0){
-                Toast.makeText(LoginActivity.this,"登录失败！",Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(LoginActivity.this,"登录失败！",Toast.LENGTH_SHORT);
                 return;
             }
             try {
@@ -357,7 +345,7 @@ public class LoginActivity extends AppCompatActivity {
                 if (grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED){
                     qqToLogin();
                 }else {
-                    Toast.makeText(this, "permisstion failed!", Toast.LENGTH_SHORT).show();
+                    ToastUtils.showToast(LoginActivity.this,"permisstion failed!",Toast.LENGTH_SHORT);
                 }
                 break;
         }
@@ -367,7 +355,6 @@ public class LoginActivity extends AppCompatActivity {
     {
         startActivity(new Intent(this,RegisterActivity.class));
     }
-
 
     /** 账号登录 */
     public void toLogin(View view){
@@ -380,9 +367,10 @@ public class LoginActivity extends AppCompatActivity {
             editPassword.setError("密码不能为空！");
             return;
         }
-        if (checkNetwork())
+        if (!MainApplication.networkinfo){   //如果当前网络不可用的话，停止登录活动
+            AlertDialogTools.showDialog(this,R.mipmap.ic_begin_live_icon,true,"确定",null,"提醒","网络状态异常！");
             return;
-
+        }
         final User loginUser=new User();
         loginUser.setAccount(editAccount.getText().toString());
         loginUser.setPassword(editPassword.getText().toString());
@@ -426,7 +414,7 @@ public class LoginActivity extends AppCompatActivity {
                         try {
                             User user = GsonUtils.getGson().fromJson(responseData, User.class);
                             MainApplication.loginUser=user;
-                            startActivity(new Intent(LoginActivity.this,MainActivity.class));
+                            startService(new Intent(LoginActivity.this,LoginService.class));
                             finish();
                         }catch (Exception e){
                             Message message = handler.obtainMessage();

@@ -3,73 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
-    android:id="@+id/drawable_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <!--打开直接看到的页面-->
+
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_height="match_parent">
-        <!--设置标题栏-->
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorToolbar"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-            >
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:id="@+id/main_message_btn"
-                android:layout_marginTop="10dp"
-                android:layout_gravity="right"
-                android:layout_marginRight="10dp"
-                >
-            </ImageView>
-        </android.support.v7.widget.Toolbar>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:id="@+id/home_main_content_fragment"
-            >
-        </LinearLayout>
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/colorBlack"
-            />
-        <android.support.design.widget.TabLayout
-            android:layout_width="match_parent"
-            android:id="@+id/home_main_change_tablayout"
-            android:layout_height="?attr/actionBarSize"
-            android:layout_marginBottom="5dp"
-            >
-            <android.support.design.widget.TabItem
-                android:id="@+id/home_main_page_text_view"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:icon="@drawable/home_main_page_selector"
-                android:text="首页"
-                 />
-            <android.support.design.widget.TabItem
-                android:id="@+id/main_live_video_image_view"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:icon="@drawable/ic_action_zhibo_video_btn"
-                />
-            <android.support.design.widget.TabItem
-                android:id="@+id/main_dynamic_image_view"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="match_parent"
-                android:icon="@drawable/home_selfinfo_selector"
-                android:gravity="center"
-                android:text="动态" />
-        </android.support.design.widget.TabLayout>
+        android:id="@+id/home_main_content_fragment"
+        >
     </LinearLayout>
 </LinearLayout>
 

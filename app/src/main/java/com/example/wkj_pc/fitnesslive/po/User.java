@@ -20,6 +20,34 @@ public class User extends DataSupport{
     private String amatar;
     private Integer age;
     private String token;
+    private Integer fansnum;//粉丝数量
+    private Integer grade;  //用户积分
+    private Integer attentionnum;  //我的关注数量
+
+    public Integer getAttentionnum() {
+        return attentionnum;
+    }
+
+    public void setAttentionnum(Integer attentionnum) {
+        this.attentionnum = attentionnum;
+    }
+
+    public Integer getFansnum() {
+        return fansnum;
+    }
+
+    public void setFansnum(Integer fansnum) {
+        this.fansnum = fansnum;
+    }
+
+    public Integer getGrade() {
+        return grade;
+    }
+
+    public void setGrade(Integer grade) {
+        this.grade = grade;
+    }
+
     public User(){}
 
     public String getToken() {

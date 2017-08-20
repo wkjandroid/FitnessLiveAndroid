@@ -10,9 +10,15 @@ import android.os.SystemClock;
 
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
+import com.example.wkj_pc.fitnesslive.po.User;
+import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
 
 import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class LoginService extends Service {
     private String longRequestUrl;
@@ -31,11 +37,18 @@ public class LoginService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    LoginUtils.longRequestServer(longRequestUrl, MainApplication.cookie);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                LoginUtils.longRequestServer(longRequestUrl, MainApplication.loginUser.getAccount(), MainApplication.cookie, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        MainApplication.loginUser=null;
+                    }
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String responseBody = response.body().string();
+                        User loginUser = GsonUtils.getGson().fromJson(responseBody, User.class);
+                        MainApplication.loginUser=loginUser;
+                    }
+                });
             }
         }).start();
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
