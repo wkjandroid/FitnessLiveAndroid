@@ -58,4 +58,10 @@ public class LoginUtils {
             }
         }
     }
+    /** 获取主页用户的的直播信息进行展示 */
+    public static void longGetUserLiveInfosFromServer(String getHomeLiveUserInfoUrl, Callback callback) {
+        Request request=new Request.Builder().url(getHomeLiveUserInfoUrl)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
 }
