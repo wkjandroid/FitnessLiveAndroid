@@ -35,7 +35,7 @@ public class LoginUtils {
     /** 登录成功后定期获取用户信息*/
     public static void longRequestServer(String path,String account,String cookie, Callback callback) {
         RequestBody body=new FormBody.Builder()
-                .add("user",account).build();
+                .add("account",account).build();
         Request request = new Request.Builder().url(path)
                     .post(body).addHeader("cookie",cookie).build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);

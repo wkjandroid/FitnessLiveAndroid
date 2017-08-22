@@ -20,12 +20,20 @@ public class User extends DataSupport{
     private String amatar;
     private Integer age;
     private String token;
+    private Boolean islive;
     private Integer fansnum;//粉丝数量
     private Integer grade;  //用户积分
     private Integer attentionnum;  //我的关注数量
 
     public Integer getAttentionnum() {
         return attentionnum;
+    }
+    public Boolean getIslive() {
+        return islive;
+    }
+
+    public void setIslive(Boolean islive) {
+        this.islive = islive;
     }
 
     public void setAttentionnum(Integer attentionnum) {

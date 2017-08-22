@@ -28,7 +28,7 @@ public class LoginService extends Service {
     }
     @Override
     public void onCreate() {
-        longRequestUrl=getResources().getString(R.string.app_longrequest_url);
+        longRequestUrl=getResources().getString(R.string.app_get_user_info_url);
         super.onCreate();
     }
 
@@ -40,13 +40,17 @@ public class LoginService extends Service {
                 LoginUtils.longRequestServer(longRequestUrl, MainApplication.loginUser.getAccount(), MainApplication.cookie, new Callback() {
                     @Override
                     public void onFailure(Call call, IOException e) {
-                        MainApplication.loginUser=null;
                     }
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
-                        String responseBody = response.body().string();
-                        User loginUser = GsonUtils.getGson().fromJson(responseBody, User.class);
-                        MainApplication.loginUser=loginUser;
+                        String responseData = response.body().string();
+                        try{
+                            User loginUser = GsonUtils.getGson().fromJson(responseData, User.class);
+                            MainApplication.loginUser=loginUser;
+                        }catch (Exception e){
+                            MainApplication.loginUser=null;
+                            e.printStackTrace();
+                        }
                     }
                 });
             }

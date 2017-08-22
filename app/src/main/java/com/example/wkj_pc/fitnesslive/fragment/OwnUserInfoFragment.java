@@ -4,12 +4,14 @@ package com.example.wkj_pc.fitnesslive.fragment;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatDelegate;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +27,7 @@ import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.activity.LoginActivity;
 import com.example.wkj_pc.fitnesslive.activity.MainActivity;
 import com.example.wkj_pc.fitnesslive.activity.SysMessageActivity;
+import com.example.wkj_pc.fitnesslive.tools.AlertDialogTools;
 import com.example.wkj_pc.fitnesslive.tools.BitmapUtils;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
@@ -51,16 +54,18 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
     private ImageView ownMessageReceiverBtn;
     private String loginQuitUrl;
     private SharedPreferences cookieSp;
-    private SharedPreferences.Editor editor;
     private LinearLayout ownUserInfoAmatartAccountLinearLayout;
     private TextView ownFansNum;
+    private FragmentTransaction tran;
+    private FragmentManager manager;
+    private FragmentTransaction tran1;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         loginQuitUrl=getResources().getString(R.string.app_destroy_url);
         cookieSp = getActivity().getSharedPreferences("cookie", MODE_PRIVATE);
-        editor=cookieSp.edit();
+        manager = getFragmentManager();
     }
 
     @Override
@@ -74,8 +79,6 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
         ownMessageReceiverBtn = (ImageView) view.findViewById(R.id.own_message_receive_btn);
         ownMessageReceiverBtn.setOnClickListener(this);
         amatarView = (CircleImageView) view.findViewById(R.id.icon_amatar_image);
-        SwitchButton ownUserDarkSwitchButton = (SwitchButton) view.findViewById(R.id.own_user_dark_switch_button);
-        setDarkMode(ownUserDarkSwitchButton);
         ownNickname = (TextView) view.findViewById(R.id.own_nickname);
         ownAccount = (TextView) view.findViewById(R.id.own_account);
         ownUserInfoMyAttention = (TextView) view.findViewById(R.id.own_user_info_my_attention);
@@ -104,19 +107,6 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
             ownMessageReceiverBtn.setImageBitmap(showBitmap);
         }
     }
-    /*夜间模式设置*/
-    private void setDarkMode(SwitchButton ownUserDarkSwitchButton) {
-        ownUserDarkSwitchButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked){
-                    ToastUtils.showToast(getActivity(),"开启",Toast.LENGTH_SHORT);
-                }else {
-                    ToastUtils.showToast(getActivity(),"关闭",Toast.LENGTH_SHORT);
-                }
-            }
-        });
-    }
     /*设置系统消息显示*/
     private void setSysMessageShow() {
 
@@ -129,13 +119,12 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
                 if (null == MainApplication.loginUser)
                 {
                     startActivity(new Intent(getActivity(),LoginActivity.class));
-                    return;
+                }else {
+                    new BottomSheetDialogFrag().show(MainActivity.manager,"dialog");
                 }
-                new BottomSheetDialogFrag().show(MainActivity.manager,"dialog");
                 break;
-            case R.id.own_main_page_text_view:   //切换到个人中心fragment
-                FragmentManager manager = getFragmentManager();
-                FragmentTransaction tran = manager.beginTransaction();
+            case R.id.own_main_page_text_view:   //切换到主页fragment
+                tran = manager.beginTransaction();
                 tran.replace(R.id.home_main_content_fragment,new MainPageFragment());
                 tran.addToBackStack(null);
                 tran.commit();
@@ -146,22 +135,24 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
             case R.id.own_user_info_destroy_linearlayout:   //退出登录
                 if (null==MainApplication.loginUser)
                     return;
-                new Thread(new Runnable() {
+                AlertDialogTools.showDialog(getActivity(), R.mipmap.icon_user_destroy_login, true, "确定", new DialogInterface.OnClickListener() {
                     @Override
-                    public void run() {
-                        LoginUtils.toRequestQuitLogin(loginQuitUrl, GsonUtils.getGson().toJson(MainApplication.loginUser),
-                                MainApplication.cookie);
+                    public void onClick(DialogInterface dialog, int which) {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                LoginUtils.toRequestQuitLogin(loginQuitUrl, GsonUtils.getGson().toJson(MainApplication.loginUser),
+                                        MainApplication.cookie);
+                            }
+                        }).start();
+                        MainApplication.loginUser=null;
+                        ownNickname.setText("昵称：小灰灰");
+                        ownAccount.setText("账号：000000");
+                        ownUserInfoGrade.setText("0");
+                        ownUserInfoMyAttention.setText("0");
+                        ownFansNum.setText("0");
                     }
-                }).start();
-                MainApplication.loginUser=null;
-                ownNickname.setText("");
-                ownAccount.setText("000000");
-                ownUserInfoGrade.setText("0");
-                ownUserInfoMyAttention.setText("0");
-                ownFansNum.setText("0");
-                break;
-            case R.id.own_user_info_about_us_linearlayout:   //关于我们
-                ToastUtils.showToast(getActivity(),"开启",Toast.LENGTH_SHORT);
+                },"取消",null,"提醒","您将退出登录!");
                 break;
             case R.id.own_user_video_linearlayout:   //个人视频
                 if (null==MainApplication.loginUser){
@@ -172,6 +163,11 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
                 if (null==MainApplication.loginUser){
                     startActivity(new Intent(getActivity(),LoginActivity.class));
                 }
+                break;
+            case R.id.own_user_info_about_us_linearlayout:   //关于我们
+                tran = manager.beginTransaction();
+                tran.replace(R.id.home_main_content_fragment,new AboutUsFragment());
+                tran.commit();
                 break;
         }
     }
@@ -188,11 +184,13 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
                 Glide.with(this).load(MainApplication.loginUser.getAmatar()).asBitmap().into(amatarView);
             }
             ownNickname.setText(MainApplication.loginUser.getNickname());
-            ownAccount.setText((null==MainApplication.loginUser.getAccount())?"0":
-                    MainApplication.loginUser.getNickname().toString());
-            ownUserInfoGrade.setText(MainApplication.loginUser.getGrade()+"");
-            ownUserInfoMyAttention.setText(MainApplication.loginUser.getAttentionnum()+"");
-            ownFansNum.setText(MainApplication.loginUser.getFansnum()+"");
+            ownAccount.setText(MainApplication.loginUser.getAccount());
+            ownUserInfoGrade.setText((null==MainApplication.loginUser.getGrade())?"0":
+                    MainApplication.loginUser.getGrade().toString());
+            ownUserInfoMyAttention.setText((null==MainApplication.loginUser.getAttentionnum())?"0"
+                    :MainApplication.loginUser.getAttentionnum()+"");
+            ownFansNum.setText((null==MainApplication.loginUser.getFansnum())?"0":
+                    MainApplication.loginUser.getFansnum()+"");
         }
         setSysMessageShow();
         initMessageReceiver();

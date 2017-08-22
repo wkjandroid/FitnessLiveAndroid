@@ -245,7 +245,7 @@ public class LoginActivity extends AppCompatActivity {
     public void doLogin(){
 
         if (!MainApplication.networkinfo){   //如果当前网络不可用的话，停止登录活动
-            AlertDialogTools.showDialog(this,R.mipmap.ic_begin_live_icon,true,"确定",null,"提醒","网络状态异常！");
+            AlertDialogTools.showDialog(this,R.mipmap.ic_begin_live_icon,true,"确定",null,null,null,"提醒","网络状态异常！");
             return;
         }
         final String cookies = cookieSp.getString("cookie",null);
@@ -368,7 +368,7 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
         if (!MainApplication.networkinfo){   //如果当前网络不可用的话，停止登录活动
-            AlertDialogTools.showDialog(this,R.mipmap.ic_begin_live_icon,true,"确定",null,"提醒","网络状态异常！");
+            AlertDialogTools.showDialog(this,R.mipmap.ic_begin_live_icon,true,"确定",null,null,null,"提醒","网络状态异常！");
             return;
         }
         final User loginUser=new User();
