@@ -34,36 +34,38 @@ public class LoginService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                LoginUtils.longRequestServer(longRequestUrl, MainApplication.loginUser.getAccount(), MainApplication.cookie, new Callback() {
-                    @Override
-                    public void onFailure(Call call, IOException e) {
-                    }
-                    @Override
-                    public void onResponse(Call call, Response response) throws IOException {
-                        String responseData = response.body().string();
-                        try{
-                            User loginUser = GsonUtils.getGson().fromJson(responseData, User.class);
-                            MainApplication.loginUser=loginUser;
-                        }catch (Exception e){
-                            MainApplication.loginUser=null;
-                            e.printStackTrace();
+        if (MainApplication.loginUser!=null){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    LoginUtils.longRequestServer(longRequestUrl, MainApplication.loginUser.getAccount(), MainApplication.cookie, new Callback() {
+                        @Override
+                        public void onFailure(Call call, IOException e) {
                         }
-                    }
-                });
+                        @Override
+                        public void onResponse(Call call, Response response) throws IOException {
+                            String responseData = response.body().string();
+                            try{
+                                User loginUser = GsonUtils.getGson().fromJson(responseData, User.class);
+                                MainApplication.loginUser=loginUser;
+                            }catch (Exception e){
+                                MainApplication.loginUser=null;
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }).start();
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            long triggerTime= SystemClock.elapsedRealtime()+25*60*1000;
+            Intent intent1=new Intent(this,LoginService.class);
+            PendingIntent pi=PendingIntent.getService(this,0,intent1,0);
+            if (Build.VERSION.SDK_INT>=23) {
+                alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME, triggerTime, pi);
             }
-        }).start();
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        long triggerTime= SystemClock.elapsedRealtime()+25*60*1000;
-        Intent intent1=new Intent(this,LoginService.class);
-        PendingIntent pi=PendingIntent.getService(this,0,intent1,0);
-        if (Build.VERSION.SDK_INT>=23) {
-            alarmManager.setAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME, triggerTime, pi);
-        }
-        else {
-            alarmManager.setExact(AlarmManager.ELAPSED_REALTIME, triggerTime, pi);
+            else {
+                alarmManager.setExact(AlarmManager.ELAPSED_REALTIME, triggerTime, pi);
+            }
         }
         return super.onStartCommand(intent, flags, startId);
     }

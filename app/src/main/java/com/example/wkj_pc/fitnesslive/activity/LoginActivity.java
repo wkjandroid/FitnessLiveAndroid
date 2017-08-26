@@ -121,6 +121,15 @@ public class LoginActivity extends AppCompatActivity {
         initListener();
 
     }
+    /** 找回密码*/
+    public void forgetPassword(View view){
+        startActivity(new Intent(this,FindPasswordActivity.class));
+    }
+    /** 用户注册*/
+    public void toRegister(View view){
+        startActivity(new Intent(this,RegisterActivity.class));
+    }
+
     /** 响应微博图片点击登录 */
     public void weboLogin(View view){
         loginType="weibo";

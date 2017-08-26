@@ -64,4 +64,10 @@ public class LoginUtils {
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
     }
+    /** 获取主页用户的的直播风格进行展示 */
+    public static void longGetUserLiveTagFromServer(String getHomeLiveTagUrl, Callback callback) {
+        Request request=new Request.Builder().url(getHomeLiveTagUrl)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
 }

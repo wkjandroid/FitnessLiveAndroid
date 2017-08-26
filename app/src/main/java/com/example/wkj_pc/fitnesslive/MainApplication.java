@@ -2,14 +2,19 @@ package com.example.wkj_pc.fitnesslive;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatDelegate;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
+import com.example.wkj_pc.fitnesslive.po.LiveTheme;
 import com.example.wkj_pc.fitnesslive.po.User;
 import com.example.wkj_pc.fitnesslive.receiver.NetWorkReceiver;
+import com.example.wkj_pc.fitnesslive.service.LiveService;
 
 import org.litepal.LitePal;
+
+import java.util.List;
 
 /**
  * Created by wkj_pc on 2017/6/11.
@@ -19,8 +24,12 @@ public class MainApplication extends Application {
     public static String cookie;
     public static User loginUser;   //普通用户的登录信息
     public static Boolean networkinfo;  //网络状态情况
+    public static List<LiveTheme> liveThemes;
     private NetWorkReceiver netWorkReceiver=new NetWorkReceiver();
     public static final String THEMID = "themId";
+    public static List<User> liveUsers ;
+    public static Bitmap amatarBitmap;
+    public static Bitmap bigLiveBitmap;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -29,7 +38,8 @@ public class MainApplication extends Application {
         //注册网络广播监听事件
         IntentFilter filter=new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(netWorkReceiver,filter);
-
+        amatarBitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.ic_amatar_img);
+        bigLiveBitmap=BitmapFactory.decodeResource(getResources(),R.drawable.biglivepic);
     }
 
     public static Context getContext(){

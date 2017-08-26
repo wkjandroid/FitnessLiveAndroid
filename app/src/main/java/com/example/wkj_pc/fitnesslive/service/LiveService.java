@@ -7,12 +7,15 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.text.TextUtils;
 
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
+import com.example.wkj_pc.fitnesslive.po.LiveTheme;
 import com.example.wkj_pc.fitnesslive.po.User;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -24,14 +27,15 @@ import okhttp3.Response;
 
 public class LiveService extends Service {
     private String getHomeLiveUserInfoUrl;
+    private String getHomeLiveUserTagUrl;
     @Override
     public void onCreate() {
         super.onCreate();
         getHomeLiveUserInfoUrl=getResources().getString(R.string.app_customer_live_getHomeLiveUserInfos_url);
+        getHomeLiveUserTagUrl=getResources().getString(R.string.app_customer_live_getHomeLivetags_url);
     }
     @Override
     public int onStartCommand(Intent intent,int flags, int startId) {
-        System.out.println("kaishizhixing huoquxinxi!------------");
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -42,14 +46,42 @@ public class LiveService extends Service {
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         String responseData = response.body().string();
-                        System.out.println("---------------------------responsedata="+responseData);
-
+                        if (!TextUtils.isEmpty(responseData)){
+                            try{
+                                List<User> users=GsonUtils.getGson().fromJson(responseData,
+                                        new TypeToken<List<User>>(){}.getType());
+                                MainApplication.liveUsers = users;
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+        }).start();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                LoginUtils.longGetUserLiveTagFromServer(getHomeLiveUserTagUrl, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                    }
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String responseData = response.body().string();
+                        try{
+                            List<LiveTheme> liveTags = GsonUtils.getGson().fromJson(responseData,
+                                    new TypeToken<List<LiveTheme>>() {}.getType());
+                            MainApplication.liveThemes=liveTags;
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
                     }
                 });
             }
         }).start();
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        long triggerTime= SystemClock.elapsedRealtime()+25*60*1000;
+        long triggerTime= SystemClock.elapsedRealtime()+60*1000;
         Intent intent1=new Intent(this,LoginService.class);
         PendingIntent pi=PendingIntent.getService(this,0,intent1,0);
         if (Build.VERSION.SDK_INT>=23) {

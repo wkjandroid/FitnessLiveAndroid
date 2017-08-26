@@ -24,10 +24,12 @@ import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.AttentionUserAdapter;
+import com.example.wkj_pc.fitnesslive.adapter.LiveChattingMessagesAdapter;
 import com.example.wkj_pc.fitnesslive.po.LiveChattingMessage;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LogUtils;
 import com.example.wkj_pc.fitnesslive.tools.OkHttpClientFactory;
+import com.example.wkj_pc.fitnesslive.tools.ToastUtils;
 import com.github.faucamp.simplertmp.RtmpHandler;
 import com.seu.magicfilter.utils.MagicFilterType;
 import net.ossrs.yasea.SrsCameraView;
@@ -85,7 +87,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     private SrsPublisher mPublisher;       //直播推流发着者
     private WebSocket baseWebSocket; //聊天用websocket
     public  List<LiveChattingMessage> liveMessages = new ArrayList<>();//直播聊天信息
-    private LiveChattingMessageAdapter adapter;
+    private LiveChattingMessagesAdapter adapter;
     private LiveChattingMessage message;
     private TextView fansPeopleNumber;//粉丝数量
     @Override
@@ -133,14 +135,13 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         attentionUserRcyclerView.setLayoutManager(layoutManager);
         AttentionUserAdapter adapter = new AttentionUserAdapter(amatarLists);
         attentionUserRcyclerView.setAdapter(adapter);
-
     }
 
     /*设置直播聊天信息展示*/
     public void initChattingMessageShowRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         liveChattingMessageRecyclerView.setLayoutManager(layoutManager);
-        adapter = new LiveChattingMessageAdapter(liveMessages);
+        adapter = new LiveChattingMessagesAdapter(liveMessages);
         liveChattingMessageRecyclerView.setAdapter(adapter);
     }
 
@@ -150,84 +151,71 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         mPublisher.setEncodeHandler(new SrsEncodeHandler(new SrsEncodeHandler.SrsEncodeListener() {
             @Override
             public void onNetworkWeak() {
-                Toast.makeText(getApplicationContext(), "网络型号弱", Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(getApplicationContext(), "网络型号弱", Toast.LENGTH_SHORT);
             }
             @Override
-            public void onNetworkResume() {
-            }
+            public void onNetworkResume() {}
             @Override
-            public void onEncodeIllegalArgumentException(IllegalArgumentException e) {
-            }
+            public void onEncodeIllegalArgumentException(IllegalArgumentException e) {}
         }));
         mPublisher.setRecordHandler(new SrsRecordHandler(new SrsRecordHandler.SrsRecordListener() {
             @Override
             public void onRecordPause() {
-                Toast.makeText(getApplicationContext(), "Record paused", Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(getApplicationContext(), "Record paused", Toast.LENGTH_SHORT);
             }
             @Override
             public void onRecordResume() {
-                Toast.makeText(getApplicationContext(), "Record resumed", Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(getApplicationContext(), "Record resumed", Toast.LENGTH_SHORT);
             }
             @Override
             public void onRecordStarted(String msg) {
-                Toast.makeText(getApplicationContext(), "Recording file: " + msg, Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(getApplicationContext(), "Recording file: " + msg, Toast.LENGTH_SHORT);
             }
             @Override
             public void onRecordFinished(String msg) {
-                Toast.makeText(getApplicationContext(), "MP4 file saved: " + msg, Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(getApplicationContext(), "MP4 file saved: " + msg, Toast.LENGTH_SHORT);
             }
             @Override
-            public void onRecordIllegalArgumentException(IllegalArgumentException e) {
-            }
+            public void onRecordIllegalArgumentException(IllegalArgumentException e) {}
             @Override
-            public void onRecordIOException(IOException e) {
-            }
+            public void onRecordIOException(IOException e) {}
         }));
         //rtmp推流状态回调
         mPublisher.setRtmpHandler(new RtmpHandler(new RtmpHandler.RtmpListener() {
             @Override
             public void onRtmpConnecting(String msg) {
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(getApplicationContext(), msg, Toast.LENGTH_SHORT);
             }
             @Override
             public void onRtmpConnected(String msg) {
-                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(getApplicationContext(), msg, Toast.LENGTH_SHORT);
             }
             @Override
-            public void onRtmpVideoStreaming() {
-            }
+            public void onRtmpVideoStreaming() {}
             @Override
-            public void onRtmpAudioStreaming() {
-            }
+            public void onRtmpAudioStreaming() {}
             @Override
             public void onRtmpStopped() {
-                Toast.makeText(getApplicationContext(), "已停止", Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(getApplicationContext(), "已停止", Toast.LENGTH_SHORT);
             }
             @Override
             public void onRtmpDisconnected() {
-                Toast.makeText(getApplicationContext(), "未连接服务器", Toast.LENGTH_SHORT).show();
+                ToastUtils.showToast(getApplicationContext(), "未连接服务器", Toast.LENGTH_SHORT);
             }
             @Override
-            public void onRtmpVideoFpsChanged(double fps) {
-            }
+            public void onRtmpVideoFpsChanged(double fps) {}
             @Override
-            public void onRtmpVideoBitrateChanged(double bitrate) {
-            }
+            public void onRtmpVideoBitrateChanged(double bitrate) {}
             @Override
-            public void onRtmpAudioBitrateChanged(double bitrate) {
-            }
+            public void onRtmpAudioBitrateChanged(double bitrate) {}
             @Override
-            public void onRtmpSocketException(SocketException e) {
-            }
+            public void onRtmpSocketException(SocketException e) {}
             @Override
-            public void onRtmpIOException(IOException e) {
-            }
+            public void onRtmpIOException(IOException e) {}
             @Override
-            public void onRtmpIllegalArgumentException(IllegalArgumentException e) {
-            }
+            public void onRtmpIllegalArgumentException(IllegalArgumentException e) {}
             @Override
-            public void onRtmpIllegalStateException(IllegalStateException e) {
-            }
+            public void onRtmpIllegalStateException(IllegalStateException e) {}
         }));
         //预览分辨率
         mPublisher.setPreviewResolution(1280, 720);

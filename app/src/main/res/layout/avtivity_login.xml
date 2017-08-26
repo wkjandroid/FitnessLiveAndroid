@@ -119,7 +119,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="忘记密码"
-                    android:onClick=""
+                    android:onClick="forgetPassword"
                     android:textSize="14sp"
                     android:layout_alignParentRight="true"
                     android:textColor="@color/colorStroke"
@@ -163,7 +163,7 @@
                 android:layout_height="38dp"
                 android:background="@null"
                 android:text="@string/app_register"
-                android:onClick="roRegister"
+                android:onClick="toRegister"
                 android:textSize="24sp"
                 />
           </LinearLayout>

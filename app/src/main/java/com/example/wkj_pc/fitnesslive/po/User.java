@@ -24,6 +24,24 @@ public class User extends DataSupport{
     private Integer fansnum;//粉丝数量
     private Integer grade;  //用户积分
     private Integer attentionnum;  //我的关注数量
+    private String livebigpic;  //直播大图
+    private String createtime;
+
+    public String getCreatetime() {
+        return createtime;
+    }
+
+    public void setCreatetime(String createtime) {
+        this.createtime = createtime;
+    }
+
+    public String getLivebigpic() {
+        return livebigpic;
+    }
+
+    public void setLivebigpic(String livebigpic) {
+        this.livebigpic = livebigpic;
+    }
 
     public Integer getAttentionnum() {
         return attentionnum;

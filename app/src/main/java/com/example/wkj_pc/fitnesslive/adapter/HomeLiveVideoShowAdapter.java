@@ -1,15 +1,21 @@
 package com.example.wkj_pc.fitnesslive.adapter;
 
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
+import com.example.wkj_pc.fitnesslive.po.LiveTheme;
+import com.example.wkj_pc.fitnesslive.po.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,11 +24,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by wkj_pc on 2017/8/21.
+ *  用户直播主页显示adapter
  */
 
 public class HomeLiveVideoShowAdapter extends RecyclerView.Adapter<HomeLiveVideoShowAdapter.ViewHolder>{
-    private List<String> lives;
+    private List<User> liveUsers;
     private Context context;
+    private  List<String> tags=new ArrayList<>();
     class ViewHolder extends RecyclerView.ViewHolder{
         CircleImageView liveUsersAmatar;
         ImageView liveUserBigImg;
@@ -39,27 +47,49 @@ public class HomeLiveVideoShowAdapter extends RecyclerView.Adapter<HomeLiveVideo
             homeLiveUserTag = (RecyclerView) itemView.findViewById(R.id.home_live_user_tag_recyclerview);
         }
     }
-    public HomeLiveVideoShowAdapter(List<String> homeUserLives) {
-        lives=homeUserLives;
+
+    public HomeLiveVideoShowAdapter(List<User> homeUserLives) {
+
+        liveUsers=homeUserLives;
     }
+
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         context=parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.home_user_live_show_item, parent, false);
         return new ViewHolder(view);
     }
+
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-      /*  Glide.with(context).load(lives.get(position)).asBitmap().into(holder.liveUsersAmatar);
+        User user = liveUsers.get(position);
+        if (TextUtils.isEmpty(user.getAmatar())){
+            holder.liveUsersAmatar.setImageBitmap(MainApplication.amatarBitmap);
+        }else {
+            Glide.with(context).load(user.getAmatar()).asBitmap().into(holder.liveUsersAmatar);
+        }
+        if (TextUtils.isEmpty(user.getLivebigpic())){
+            holder.liveUserBigImg.setImageBitmap(MainApplication.bigLiveBitmap);
+        }else {
+            Glide.with(context).load(user.getLivebigpic()).asBitmap().into(holder.liveUserBigImg);
+        }
+        holder.homeUserLiveNumsShow.setText(user.getFansnum()+"人再看");
+        holder.liveUserNicknameShow.setText(user.getNickname());
+        if (MainApplication.liveThemes!=null){
+            List<LiveTheme> themes = MainApplication.liveThemes;
+            tags.clear();
+            for ( int i=0;i<themes.size();i++){
+                LiveTheme liveTheme=themes.get(i);
+                System.out.println("---------themes");
 
-        holder.homeUserLiveNumsShow.setText(lives.get(position).getBytes());
-        Glide.with(context).load("").asBitmap().into(holder.liveUserBigImg);
-        holder.homeUserLiveNumsShow.setText(lives.get(position).getBytes());*/
-      List<String> tags=new ArrayList<>();
-      tags.add("清纯");
-      tags.add("大方");
-        tags.add("性感");
-      initRecyelerView(holder.homeLiveUserTag,tags);
+                if (liveTheme.getUid().equals(user.getUid()))
+                {
+                    tags.add(liveTheme.getLttheme());
+                    System.out.println("------------zhixing");
+                }
+            }
+            initRecyelerView(holder.homeLiveUserTag,tags );
+        }
     }
     public void initRecyelerView(RecyclerView recyclerView,List<String> tags){
         LiveUserTagAdapter adapter = new LiveUserTagAdapter(tags);
@@ -70,6 +100,6 @@ public class HomeLiveVideoShowAdapter extends RecyclerView.Adapter<HomeLiveVideo
     }
     @Override
     public int getItemCount() {
-        return lives.size();
+        return liveUsers.size();
     }
 }

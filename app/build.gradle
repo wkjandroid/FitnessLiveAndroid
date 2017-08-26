@@ -45,6 +45,7 @@ dependencies {
     compile 'com.android.support:support-v4:25.3.1'
     compile 'com.squareup.okhttp3:okhttp:3.5.0'
     compile 'com.kyleduo.switchbutton:library:1.4.6'
+    compile 'com.jph.takephoto:takephoto_library:4.0.3'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 }

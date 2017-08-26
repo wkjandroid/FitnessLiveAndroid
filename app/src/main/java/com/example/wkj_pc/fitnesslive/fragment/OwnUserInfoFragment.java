@@ -27,6 +27,8 @@ import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.activity.LoginActivity;
 import com.example.wkj_pc.fitnesslive.activity.MainActivity;
 import com.example.wkj_pc.fitnesslive.activity.SysMessageActivity;
+import com.example.wkj_pc.fitnesslive.service.LiveService;
+import com.example.wkj_pc.fitnesslive.service.LoginService;
 import com.example.wkj_pc.fitnesslive.tools.AlertDialogTools;
 import com.example.wkj_pc.fitnesslive.tools.BitmapUtils;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
@@ -126,7 +128,6 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
             case R.id.own_main_page_text_view:   //切换到主页fragment
                 tran = manager.beginTransaction();
                 tran.replace(R.id.home_main_content_fragment,new MainPageFragment());
-                tran.addToBackStack(null);
                 tran.commit();
                 break;
             case R.id.own_message_receive_btn:  // 跳转去处理系统的通知消息
@@ -145,6 +146,8 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
                                         MainApplication.cookie);
                             }
                         }).start();
+                        getActivity().stopService(new Intent(getActivity(), LiveService.class));
+                        getActivity().stopService(new Intent(getActivity(), LoginService.class));
                         MainApplication.loginUser=null;
                         ownNickname.setText("昵称：小灰灰");
                         ownAccount.setText("账号：000000");
@@ -162,11 +165,17 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
             case R.id.own_user_info_amatar_account_linearlayout:
                 if (null==MainApplication.loginUser){
                     startActivity(new Intent(getActivity(),LoginActivity.class));
+                }else {
+                    tran = manager.beginTransaction();
+                    tran.replace(R.id.home_main_content_fragment,new UserInfoEditFragment());
+                    tran.addToBackStack(null);
+                    tran.commit();
                 }
                 break;
             case R.id.own_user_info_about_us_linearlayout:   //关于我们
                 tran = manager.beginTransaction();
                 tran.replace(R.id.home_main_content_fragment,new AboutUsFragment());
+                tran.addToBackStack(null);
                 tran.commit();
                 break;
         }

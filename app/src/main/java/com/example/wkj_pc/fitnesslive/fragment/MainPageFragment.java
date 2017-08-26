@@ -8,9 +8,12 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,22 +27,84 @@ import com.example.wkj_pc.fitnesslive.activity.LoginActivity;
 import com.example.wkj_pc.fitnesslive.activity.MainActivity;
 import com.example.wkj_pc.fitnesslive.activity.SysMessageActivity;
 import com.example.wkj_pc.fitnesslive.adapter.HomeLiveVideoShowAdapter;
+import com.example.wkj_pc.fitnesslive.po.LiveTheme;
+import com.example.wkj_pc.fitnesslive.po.User;
 import com.example.wkj_pc.fitnesslive.tools.BitmapUtils;
+import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
+import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
+import com.google.gson.reflect.TypeToken;
 
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 
 public class MainPageFragment extends Fragment implements View.OnClickListener{
+
     private FragmentManager manager;
     private ImageView homeMessageReceiverBtn;
     private RecyclerView homeUserLiveShowRecyclerView;
     private LinearLayout bottomLinearLayout;
+    private Timer timer;
+    private TimerTask timerTask;
+    private TimerTask longTimerTask;
+    /** 接收到定时器的消息，跟新页面 */
+    private Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 1:
+                    initRecyclerView();
+                    break;
+            }
+        }
+    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         manager=getFragmentManager();
+        final String getHomeLiveUserInfoUrl=getResources().getString(R.string.app_customer_live_getHomeLiveUserInfos_url);
+        final String getHomeLiveUserTagUrl = getResources().getString(R.string.app_customer_live_getHomeLivetags_url);
+        getLiveInfos(getHomeLiveUserTagUrl,getHomeLiveUserInfoUrl);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        /** 设置定时器，定时更新页面*/
+        timer=new Timer();
+        timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (MainApplication.liveUsers!=null){
+                    Message message = new Message();
+                    message.what=1;
+                    handler.sendMessage(message);
+                    timerTask.cancel();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            if (MainApplication.liveUsers!=null){
+                                Message message = new Message();
+                                message.what=1;
+                                handler.sendMessage(message);
+                                timerTask.cancel();
+                            }
+                        }
+                    },0,2*60*1000);
+                }
+            }
+        };
+        timer.schedule(timerTask,0,500);
+        setSysMessageShow();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -54,26 +119,16 @@ public class MainPageFragment extends Fragment implements View.OnClickListener{
         bottomLinearLayout = (LinearLayout) view.findViewById(R.id.bottom_linearlayout);
         ImageView homeUserSearchImgView= (ImageView) view.findViewById(R.id.home_user_search_img_view);
         homeUserSearchImgView.setOnClickListener(this);
-        initRecyclerView();
+        if (MainApplication.liveUsers!=null){
+            initRecyclerView();
+        }
         return view;
     }
 
-    private void initRecyclerView() {
-        List <String> lists=new ArrayList<>();
-        for (int i=0;i<50;i++){
-            lists.add("你好");
-        }
-        LinearLayoutManager lMamager=new LinearLayoutManager(getActivity());
-        homeUserLiveShowRecyclerView.setLayoutManager(lMamager);
-
-        HomeLiveVideoShowAdapter adapter=new HomeLiveVideoShowAdapter(lists);
-        homeUserLiveShowRecyclerView.setAdapter(adapter);
-    }
 
     @Override
     public void onClick(View v) {
         switch(v.getId()){
-
             case R.id.home_live_video_image_view:   //弹出拍摄或者直播图标
                 //滑出直播和拍摄选项
                 if (null == MainApplication.loginUser)
@@ -83,31 +138,27 @@ public class MainPageFragment extends Fragment implements View.OnClickListener{
                     new BottomSheetDialogFrag().show(MainActivity.manager,"dialog");
                 }
                 break;
-            case R.id.home_message_receive_btn:
+            case R.id.home_message_receive_btn:     //打开系统消息处理activity
                 startActivity(new Intent(getActivity(), SysMessageActivity.class));
                 break;
             case R.id.home_user_search_img_view:
                 break;
             case R.id.home_personinfo_image_view:   //切换到个人中心fragment
-                FragmentTransaction tran = manager.beginTransaction();
-                tran.replace(R.id.home_main_content_fragment,new OwnUserInfoFragment());
-                tran.addToBackStack(null);
-                tran.commit();
+                if (MainApplication.loginUser!=null){
+                    FragmentTransaction tran = manager.beginTransaction();
+                    tran.replace(R.id.home_main_content_fragment,new UserInfoEditFragment());
+                    tran.commit();
+                }else {
+                    FragmentTransaction tran = manager.beginTransaction();
+                    tran.replace(R.id.home_main_content_fragment,new OwnUserInfoFragment());
+                    tran.commit();
+                }
                 break;
         }
     }
-    @Override
-    public void onResume() {
-        super.onResume();
-        setSysMessageShow();
-        initMessageReceiver();
-    }
+
     /*设置系统消息显示*/
     private void setSysMessageShow() {
-
-    }
-    /*设置系统消息*/
-    private void initMessageReceiver() {
         int count = 3;
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.icon_action_message_receiver)
                 .copy(Bitmap.Config.ARGB_8888, true);
@@ -118,8 +169,69 @@ public class MainPageFragment extends Fragment implements View.OnClickListener{
             homeMessageReceiverBtn.setImageBitmap(showBitmap);
         }
     }
+
+    /** 初始化直播用户的页面，头像风格和大图 */
+    private void initRecyclerView() {
+        LinearLayoutManager lMamager=new LinearLayoutManager(getActivity());
+        homeUserLiveShowRecyclerView.setLayoutManager(lMamager);
+        HomeLiveVideoShowAdapter adapter=new HomeLiveVideoShowAdapter(MainApplication.liveUsers);
+        homeUserLiveShowRecyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+    }
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+    }
+    /**  fragment创建的时候获取直播用户的信息 */
+    private void getLiveInfos(final String getHomeLiveUserTagUrl, final String getHomeLiveUserInfoUrl) {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                LoginUtils.longGetUserLiveTagFromServer(getHomeLiveUserTagUrl, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {}
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String responseData = response.body().string();
+                        try{
+                            List<LiveTheme> liveTags = GsonUtils.getGson().fromJson(responseData,
+                                    new TypeToken<List<LiveTheme>>() {}.getType());
+                            MainApplication.liveThemes=liveTags;
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                LoginUtils.longGetUserLiveInfosFromServer(getHomeLiveUserInfoUrl, new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {}
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String responseData = response.body().string();
+                        if (!TextUtils.isEmpty(responseData)){
+                            try{
+                                List<User> users= GsonUtils.getGson().fromJson(responseData,
+                                        new TypeToken<List<User>>(){}.getType());
+                                MainApplication.liveUsers = users;
+                            }catch (Exception e){
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                });
+            }
+        }).start();
     }
 }
