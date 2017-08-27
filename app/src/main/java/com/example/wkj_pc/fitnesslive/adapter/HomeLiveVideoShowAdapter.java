@@ -80,12 +80,9 @@ public class HomeLiveVideoShowAdapter extends RecyclerView.Adapter<HomeLiveVideo
             tags.clear();
             for ( int i=0;i<themes.size();i++){
                 LiveTheme liveTheme=themes.get(i);
-                System.out.println("---------themes");
-
                 if (liveTheme.getUid().equals(user.getUid()))
                 {
                     tags.add(liveTheme.getLttheme());
-                    System.out.println("------------zhixing");
                 }
             }
             initRecyelerView(holder.homeLiveUserTag,tags );

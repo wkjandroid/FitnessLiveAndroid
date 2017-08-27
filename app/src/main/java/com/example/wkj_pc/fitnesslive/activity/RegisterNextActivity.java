@@ -79,11 +79,16 @@ public class RegisterNextActivity extends AppCompatActivity {
                                 runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        if (responseData.contains("true")){
+                                        if (responseData.contains(":true")){
                                             ToastUtils.showToast(RegisterNextActivity.this,"注册成功！",Toast.LENGTH_SHORT);
                                             startActivity(new Intent(RegisterNextActivity.this,LoginActivity.class));
                                             finish();
-                                        } else {
+                                        }else if (responseData.contains(":false")) {
+
+                                            ToastUtils.showToast(RegisterNextActivity.this,"该用户已经存在!",Toast.LENGTH_SHORT);
+                                            startActivity(new Intent(RegisterNextActivity.this,LoginActivity.class));
+                                            finish();
+                                        }else{
                                             ToastUtils.showToast(RegisterNextActivity.this,"服务器繁忙...",Toast.LENGTH_SHORT);
                                         }
                                     }
