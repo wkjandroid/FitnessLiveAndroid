@@ -25,7 +25,7 @@
             android:layout_gravity="center"
             />
     </android.support.v7.widget.Toolbar>
-    <!--手机号-->
+    <!--密码-->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:id="@+id/find_pwd_mobile_number_linearlayout"
+            android:id="@+id/find_pwd_next_linearlayout"
             android:background="@drawable/shape_nostroke_bg_btn"
             android:gravity="center">
 
@@ -54,15 +54,15 @@
                 android:textSize="20sp"
                 />
             <EditText
-                android:id="@+id/fing_pwd_phonenumber_edit_text"
+                android:id="@+id/find_pwd_next_edit_text"
                 android:layout_width="0dp"
                 android:textSize="18sp"
                 android:layout_height="38sp"
                 android:layout_weight="8"
+                android:inputType="textPassword"
                 android:background="@null"
-                android:inputType="number"
-                android:maxLength="11"
-                android:hint="手机号"
+                android:maxLength="18"
+                android:hint="请输入密码(6-18)位"
                 android:maxLines="1" />
         </LinearLayout>
     </LinearLayout>
@@ -75,48 +75,37 @@
         android:paddingTop="15dp">
         android:paddingTop="15dp"
         <LinearLayout
-            android:id="@+id/find_pwd_verifycode_linearlayout"
+            android:id="@+id/find_pwd_next_verify_pwd_linearlayout"
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:background="@drawable/shape_nostroke_bg_btn"
             android:gravity="center">
-
             <ImageView
                 android:layout_width="0dp"
                 android:layout_height="24dp"
-                android:layout_weight="3"
+                android:layout_weight="2"
                 android:src="@mipmap/icon_message_verifycode_img" />
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text=" |"
+                android:text="|"
                 android:textSize="20sp" />
             <EditText
-                android:id="@+id/find_pwd_verifycode_edit_text"
+                android:id="@+id/find_pwd_next_verify_pwd_edit_text"
                 android:layout_width="0dp"
                 android:layout_height="38dp"
                 android:layout_weight="8"
                 android:background="@null"
-                android:maxLength="6"
-                android:inputType="number"
-                android:hint="   短信验证码"
+                android:maxLength="18"
+                android:hint="确认密码"
+                android:inputType="textPassword"
                 android:maxLines="1"
                 android:textSize="18sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginRight="15dp"
-                android:id="@+id/getVerifycodeTextView"
-                android:background="@drawable/shape_getverifycode_bg_btn"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:text="@string/app_get_verify_code" />
         </LinearLayout>
     </LinearLayout>
-    <!--登录按钮-->
+    <!--修改按钮-->
     <LinearLayout
         android:layout_width="match_parent"
         android:paddingTop="60dp"
@@ -131,8 +120,8 @@
                 android:layout_width="260dp"
                 android:layout_height="38dp"
                 android:background="@null"
-                android:text="@string/app_nextstep"
-                android:id="@+id/find_pwd_nextstep_btn"
+                android:text="@string/app_alter_password"
+                android:id="@+id/alter_pwd_nextstep_btn"
                 android:textSize="24sp"
                 />
         </LinearLayout>

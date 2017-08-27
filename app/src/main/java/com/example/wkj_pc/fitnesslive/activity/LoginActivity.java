@@ -61,8 +61,8 @@ public class LoginActivity extends AppCompatActivity {
 
     @BindView(R.id.login_toolbar)
     Toolbar loginToolbar;
-    @BindView(R.id.edit_account)
-    EditText editAccount;
+    @BindView(R.id.user_login_mobile_num_edit_text)
+    EditText mobileNum;
     @BindView(R.id.edit_password)
     EditText editPassword;
     @BindView(R.id.open_slide_select_login_img)
@@ -365,25 +365,25 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(new Intent(this,RegisterActivity.class));
     }
 
-    /** 账号登录 */
+    /** 手机号登录 */
     public void toLogin(View view){
 
         loginType="account";
-        if (TextUtils.isEmpty(editAccount.getText().toString().trim())){
-            editAccount.setError("账号不能为空！");
+        if (!MainApplication.networkinfo){   //如果当前网络不可用的话，停止登录活动
+            AlertDialogTools.showDialog(this,R.mipmap.ic_begin_live_icon,true,"确定",null,null,null,"提醒","网络状态异常！");
+            return;
+        }
+        if (TextUtils.isEmpty(mobileNum.getText().toString().trim())){
+            mobileNum.setError("账号不能为空！");
             return;
         }else if (TextUtils.isEmpty(editPassword.getText().toString().trim())){
             editPassword.setError("密码不能为空！");
             return;
         }
-        if (!MainApplication.networkinfo){   //如果当前网络不可用的话，停止登录活动
-            AlertDialogTools.showDialog(this,R.mipmap.ic_begin_live_icon,true,"确定",null,null,null,"提醒","网络状态异常！");
-            return;
-        }
         final User loginUser=new User();
-        loginUser.setAccount(editAccount.getText().toString());
+        loginUser.setPhonenum(mobileNum.getText().toString());
         loginUser.setPassword(editPassword.getText().toString());
-        loginUser.setToken("account");
+        loginUser.setToken("mobile");
         String loginInfo = GsonUtils.getGson().toJson(loginUser);
         // 将cookie存储到sp中，以便进入同一个会话中
         final String cookies = cookieSp.getString("cookie", null);
@@ -408,7 +408,7 @@ public class LoginActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                editAccount.setError("账号或密码错误！");
+                                mobileNum.setError("账号或密码错误！");
                             }
                         });
 
@@ -416,7 +416,7 @@ public class LoginActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                editAccount.setError("账号不存在！");
+                                mobileNum.setError("账号不存在！");
                             }
                         });
                     }else {
@@ -441,7 +441,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 /** 初始化监听事件，设置文本输入框的颜色变化*/
     private void initListener() {
-        editAccount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        mobileNum.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus){

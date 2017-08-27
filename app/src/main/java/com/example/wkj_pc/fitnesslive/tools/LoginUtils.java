@@ -70,4 +70,32 @@ public class LoginUtils {
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
     }
+    /** 请求服务器获取信息验证码 */
+    public static void getMobileVerifyCodeFromServer(String getVerifycodeUrl, Callback callback) {
+        Request request=new Request.Builder().url(getVerifycodeUrl)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
+    /** 用户修改密码 */
+    public static void updateUserPassword(String getVerifycodeUrl ,String mobileNum,String password,Callback callback) {
+        RequestBody body=new FormBody.Builder()
+                .add("mobilenum",mobileNum)
+                .add("password",password)
+                .build();
+        Request request=new Request.Builder().url(getVerifycodeUrl)
+                .post(body)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
+
+    public static void registerUser(String registerUserUrl, String mobileNum, String password, Callback callback) {
+        RequestBody body=new FormBody.Builder()
+                .add("mobilenum",mobileNum)
+                .add("password",password)
+                .build();
+        Request request=new Request.Builder().url(registerUserUrl)
+                .post(body)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
 }

@@ -25,6 +25,7 @@ public class MainApplication extends Application {
     public static User loginUser;   //普通用户的登录信息
     public static Boolean networkinfo;  //网络状态情况
     public static List<LiveTheme> liveThemes;
+    public static String verifyCode; //请求服务器获取的验证码
     private NetWorkReceiver netWorkReceiver=new NetWorkReceiver();
     public static final String THEMID = "themId";
     public static List<User> liveUsers ;

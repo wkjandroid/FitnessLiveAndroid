@@ -144,15 +144,9 @@ public class MainPageFragment extends Fragment implements View.OnClickListener{
             case R.id.home_user_search_img_view:
                 break;
             case R.id.home_personinfo_image_view:   //切换到个人中心fragment
-                if (MainApplication.loginUser!=null){
-                    FragmentTransaction tran = manager.beginTransaction();
-                    tran.replace(R.id.home_main_content_fragment,new UserInfoEditFragment());
-                    tran.commit();
-                }else {
-                    FragmentTransaction tran = manager.beginTransaction();
-                    tran.replace(R.id.home_main_content_fragment,new OwnUserInfoFragment());
-                    tran.commit();
-                }
+                FragmentTransaction tran = manager.beginTransaction();
+                tran.replace(R.id.home_main_content_fragment,new OwnUserInfoFragment());
+                tran.commit();
                 break;
         }
     }
