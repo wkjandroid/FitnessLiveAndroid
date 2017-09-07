@@ -1,11 +1,15 @@
 package com.example.wkj_pc.fitnesslive.tools;
 
+import android.util.Base64;
+
+
 import java.io.IOException;
+import java.io.InputStream;
+
 import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
-import okhttp3.Response;
 
 /**
  * Created by wkj_pc on 2017/6/13.
@@ -94,6 +98,52 @@ public class LoginUtils {
                 .add("password",password)
                 .build();
         Request request=new Request.Builder().url(registerUserUrl)
+                .post(body)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
+
+    public static void updateUserAmatar(String updateUserInfoUrl, String account, InputStream inputstream,
+                                        Callback callback) {
+        byte [] buffer= new byte[0];
+        try {
+            buffer = new byte[inputstream.available()];
+            inputstream.read(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        RequestBody body=new FormBody.Builder()
+                .add("account",account)
+                .add("content", Base64.encodeToString(buffer,Base64.DEFAULT))
+                .add("type", "amatar")
+                .build();
+        Request request=new Request.Builder().url(updateUserInfoUrl)
+                .post(body)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
+
+    public static void updateUserEditInfos(String updateUserInfoUrl, String account, String content,
+                                           String type, Callback callback) {
+        RequestBody body=new FormBody.Builder()
+                .add("account",account)
+                .add("content", content)
+                .add("type", type)
+                .build();
+        Request request=new Request.Builder().url(updateUserInfoUrl)
+                .post(body)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+
+    }
+    public static void updateUserSex(String updateUserInfoUrl, String account, String content,
+                                     Callback callback) {
+        RequestBody body = new FormBody.Builder()
+                .add("account", account)
+                .add("content", content)
+                .add("type", "sex")
+                .build();
+        Request request = new Request.Builder().url(updateUserInfoUrl)
                 .post(body)
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);

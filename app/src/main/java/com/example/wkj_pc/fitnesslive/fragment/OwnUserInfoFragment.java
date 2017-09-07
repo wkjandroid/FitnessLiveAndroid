@@ -11,15 +11,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatDelegate;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
@@ -27,15 +25,13 @@ import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.activity.LoginActivity;
 import com.example.wkj_pc.fitnesslive.activity.MainActivity;
 import com.example.wkj_pc.fitnesslive.activity.SysMessageActivity;
+import com.example.wkj_pc.fitnesslive.activity.UserInfoEditActivity;
 import com.example.wkj_pc.fitnesslive.service.LiveService;
 import com.example.wkj_pc.fitnesslive.service.LoginService;
 import com.example.wkj_pc.fitnesslive.tools.AlertDialogTools;
 import com.example.wkj_pc.fitnesslive.tools.BitmapUtils;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
-import com.example.wkj_pc.fitnesslive.tools.ToastUtils;
-import com.kyleduo.switchbutton.SwitchButton;
-
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -166,10 +162,7 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
                 if (null==MainApplication.loginUser){
                     startActivity(new Intent(getActivity(),LoginActivity.class));
                 }else {
-                    tran = manager.beginTransaction();
-                    tran.replace(R.id.home_main_content_fragment,new UserInfoEditFragment());
-                    tran.addToBackStack(null);
-                    tran.commit();
+                    startActivity(new Intent(getActivity(),UserInfoEditActivity.class));
                 }
                 break;
             case R.id.own_user_info_about_us_linearlayout:   //关于我们
@@ -189,7 +182,7 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
         super.onResume();
         //显示登录用户信息
         if (null != MainApplication.loginUser) {
-            if (null!=MainApplication.loginUser.getAmatar()){
+            if (!TextUtils.isEmpty(MainApplication.loginUser.getAmatar())){
                 Glide.with(this).load(MainApplication.loginUser.getAmatar()).asBitmap().into(amatarView);
             }
             ownNickname.setText(MainApplication.loginUser.getNickname());

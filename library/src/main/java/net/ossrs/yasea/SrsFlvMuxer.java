@@ -24,9 +24,8 @@ public class SrsFlvMuxer {
     private static final int VIDEO_ALLOC_SIZE = 128 * 1024;
     private static final int AUDIO_ALLOC_SIZE = 4 * 1024;
 
-    private volatile boolean connected = false;
+    private volatile boolean started = false;
     private DefaultRtmpPublisher publisher;
-    private RtmpHandler mHandler;
 
     private Thread worker;
     private final Object txFrameLock = new Object();
@@ -48,7 +47,6 @@ public class SrsFlvMuxer {
      * @param handler the rtmp event handler.
      */
     public SrsFlvMuxer(RtmpHandler handler) {
-        mHandler = handler;
         publisher = new DefaultRtmpPublisher(handler);
     }
 
@@ -91,26 +89,24 @@ public class SrsFlvMuxer {
         } catch (IllegalStateException e) {
             // Ignore illegal state.
         }
-        connected = false;
         mVideoSequenceHeader = null;
         mAudioSequenceHeader = null;
         Log.i(TAG, "worker: disconnect ok.");
     }
 
     private boolean connect(String url) {
-        if (!connected) {
-            Log.i(TAG, String.format("worker: connecting to RTMP server by url=%s\n", url));
-            if (publisher.connect(url)) {
-                connected = publisher.publish("live");
-            }
-            mVideoSequenceHeader = null;
-            mAudioSequenceHeader = null;
+        boolean connected = false;
+        Log.i(TAG, String.format("worker: connecting to RTMP server by url=%s\n", url));
+        if (publisher.connect(url)) {
+            connected = publisher.publish("live");
         }
+        mVideoSequenceHeader = null;
+        mAudioSequenceHeader = null;
         return connected;
     }
 
     private void sendFlvTag(SrsFlvFrame frame) {
-        if (!connected || frame == null) {
+        if (frame == null) {
             return;
         }
 
@@ -131,6 +127,7 @@ public class SrsFlvMuxer {
      * start to the remote server for remux.
      */
     public void start(final String rtmpUrl) {
+        started = true;
         worker = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -176,6 +173,7 @@ public class SrsFlvMuxer {
      * stop the muxer, disconnect RTMP connection.
      */
     public void stop() {
+        started = false;
         mFlvTagCache.clear();
         if (worker != null) {
             worker.interrupt();
@@ -190,7 +188,7 @@ public class SrsFlvMuxer {
         flv.reset();
         needToFindKeyFrame = true;
         Log.i(TAG, "SrsFlvMuxer closed");
-
+        // We should not block the main thread
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -982,9 +980,11 @@ public class SrsFlvMuxer {
         }
 
         private void flvTagCacheAdd(SrsFlvFrame frame) {
-            mFlvTagCache.add(frame);
-            if (frame.isVideo()) {
-                getVideoFrameCacheNumber().incrementAndGet();
+            if (started) {
+                mFlvTagCache.add(frame);
+                if (frame.isVideo()) {
+                    getVideoFrameCacheNumber().incrementAndGet();
+                }
             }
             synchronized (txFrameLock) {
                 txFrameLock.notifyAll();

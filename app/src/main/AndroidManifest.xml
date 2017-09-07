@@ -65,7 +65,7 @@
         <activity android:name=".activity.LiveActivity" />
         <activity android:name=".activity.VideoShootActivity" />
         <activity android:name=".activity.SysMessageActivity" />
-
+        <activity android:name=".activity.UserInfoEditActivity"/>
         <service
             android:name=".service.LiveService"
             android:enabled="true"

@@ -13,4 +13,5 @@
     <color name="colorToolbar">#68ede5</color>
     <color name="color_white">#FFF</color>
     <color name="lighter_gray_no_transparent">#68ede5</color>
+    <color name="bottom_menu">#eae4e4</color>
 </resources>
