@@ -11,6 +11,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.tools.BottomMenuUtils;
@@ -150,7 +151,7 @@ public class UserInfoEditActivity extends TakePhotoActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Glide.with(UserInfoEditActivity.this).load(file).into(amatarImageView);
+                Glide.with(UserInfoEditActivity.this).load(file).error(R.drawable.head_img).into(amatarImageView);
             }
         });
         FileInputStream inputStream=null;
@@ -175,7 +176,7 @@ public class UserInfoEditActivity extends TakePhotoActivity {
                         }
                     });
                 }else if (responseData.contains("true:")){
-                    String amatarUrl = responseData.substring(6);
+                    String amatarUrl = responseData.substring(5);
                     MainApplication.loginUser.setAmatar(amatarUrl);
                 }
             }

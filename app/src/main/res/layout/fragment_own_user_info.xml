@@ -50,14 +50,15 @@
             <LinearLayout
                 android:id="@+id/own_user_info_amatar_account_linearlayout"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="110dp"
                 android:orientation="horizontal">
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/icon_amatar_image"
                     android:layout_width="0dp"
-                    android:layout_height="50dp"
+                    android:layout_height="100dp"
                     android:layout_gravity="center"
-                    android:layout_weight="1"
+                    android:layout_weight="2"
+                    android:scaleType="centerCrop"
                     android:src="@drawable/head_img" />
                 <LinearLayout
                     android:layout_width="0dp"

@@ -20,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.activity.LoginActivity;
@@ -144,6 +145,7 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
                         }).start();
                         getActivity().stopService(new Intent(getActivity(), LiveService.class));
                         getActivity().stopService(new Intent(getActivity(), LoginService.class));
+                        amatarView.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.drawable.head_img));
                         MainApplication.loginUser=null;
                         ownNickname.setText("昵称：小灰灰");
                         ownAccount.setText("账号：000000");
@@ -183,7 +185,8 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
         //显示登录用户信息
         if (null != MainApplication.loginUser) {
             if (!TextUtils.isEmpty(MainApplication.loginUser.getAmatar())){
-                Glide.with(this).load(MainApplication.loginUser.getAmatar()).asBitmap().into(amatarView);
+                Glide.with(this).load(MainApplication.loginUser.getAmatar())
+                        .asBitmap().into(amatarView);
             }
             ownNickname.setText(MainApplication.loginUser.getNickname());
             ownAccount.setText(MainApplication.loginUser.getAccount());
