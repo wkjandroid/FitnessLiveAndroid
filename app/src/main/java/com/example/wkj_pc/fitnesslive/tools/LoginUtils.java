@@ -3,6 +3,7 @@ package com.example.wkj_pc.fitnesslive.tools;
 import android.util.Base64;
 
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -105,7 +106,7 @@ public class LoginUtils {
 
     public static void updateUserAmatar(String updateUserInfoUrl, String account, InputStream inputstream,
                                         Callback callback) {
-        byte [] buffer= new byte[0];
+        byte [] buffer= null;
         try {
             buffer = new byte[inputstream.available()];
             inputstream.read(buffer);
@@ -144,6 +145,25 @@ public class LoginUtils {
                 .add("type", "sex")
                 .build();
         Request request = new Request.Builder().url(updateUserInfoUrl)
+                .post(body)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
+
+    public static void updateUserLiveBigPicUrl(String updateUserInfoUrl, String account, FileInputStream inputStream, Callback callback) {
+        byte [] buffer= null;
+        try {
+            buffer = new byte[inputStream.available()];
+            inputStream.read(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        RequestBody body=new FormBody.Builder()
+                .add("account",account)
+                .add("content", Base64.encodeToString(buffer,Base64.DEFAULT))
+                .add("type", "livebigimg")
+                .build();
+        Request request=new Request.Builder().url(updateUserInfoUrl)
                 .post(body)
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);

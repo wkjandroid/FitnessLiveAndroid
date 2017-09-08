@@ -35,14 +35,13 @@ public class LiveService extends Service {
         getHomeLiveUserTagUrl=getResources().getString(R.string.app_customer_live_getHomeLivetags_url);
     }
     @Override
-    public int onStartCommand(Intent intent,int flags, int startId) {
+    public int onStartCommand(final Intent intent, int flags, int startId) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 LoginUtils.longGetUserLiveInfosFromServer(getHomeLiveUserInfoUrl, new Callback() {
                     @Override
-                    public void onFailure(Call call, IOException e) {
-                    }
+                    public void onFailure(Call call, IOException e) {}
                     @Override
                     public void onResponse(Call call, Response response) throws IOException {
                         String responseData = response.body().string();
@@ -73,6 +72,12 @@ public class LiveService extends Service {
                             List<LiveTheme> liveTags = GsonUtils.getGson().fromJson(responseData,
                                     new TypeToken<List<LiveTheme>>() {}.getType());
                             MainApplication.liveThemes=liveTags;
+                            MainApplication.nativeLiveThemes.clear();
+                            for (int i=0;i<liveTags.size();i++){
+                                if (null!=MainApplication.loginUser && liveTags.get(i).getUid().equals(MainApplication.loginUser.getUid())){
+                                    MainApplication.nativeLiveThemes.add(liveTags.get(i).getLttheme());
+                                }
+                            }
                         }catch (Exception e){
                             e.printStackTrace();
                         }

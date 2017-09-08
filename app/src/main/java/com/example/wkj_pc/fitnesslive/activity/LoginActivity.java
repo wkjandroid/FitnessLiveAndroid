@@ -278,6 +278,7 @@ public class LoginActivity extends AppCompatActivity {
                     try {
                         User user = GsonUtils.getGson().fromJson(responseData, User.class);
                         MainApplication.loginUser=user;
+                        setNativeLiveThemes();
                         startService(new Intent(LoginActivity.this, LoginService.class));
                         finish();
                     }catch (Exception e) {
@@ -423,6 +424,7 @@ public class LoginActivity extends AppCompatActivity {
                         try {
                             User user = GsonUtils.getGson().fromJson(responseData, User.class);
                             MainApplication.loginUser=user;
+                            setNativeLiveThemes();
                             startService(new Intent(LoginActivity.this,LoginService.class));
                             finish();
                         }catch (Exception e){
@@ -438,6 +440,15 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+    private void  setNativeLiveThemes(){
+        MainApplication.nativeLiveThemes.clear();
+        for (int i=0;i<MainApplication.liveThemes.size();i++) {
+            if (MainApplication.loginUser!=null && MainApplication.loginUser.getUid()==
+                    MainApplication.liveThemes.get(i).getUid()){
+                MainApplication.nativeLiveThemes.add( MainApplication.liveThemes.get(i).getLttheme());
+            }
+        }
     }
 /** 初始化监听事件，设置文本输入框的颜色变化*/
     private void initListener() {

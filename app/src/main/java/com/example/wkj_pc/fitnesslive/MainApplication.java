@@ -14,6 +14,7 @@ import com.example.wkj_pc.fitnesslive.service.LiveService;
 
 import org.litepal.LitePal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +27,7 @@ public class MainApplication extends Application {
     public static Boolean networkinfo;  //网络状态情况
     public static List<LiveTheme> liveThemes;
     public static String verifyCode; //请求服务器获取的验证码
+    public static List<String> nativeLiveThemes;
     private NetWorkReceiver netWorkReceiver=new NetWorkReceiver();
     public static final String THEMID = "themId";
     public static List<User> liveUsers ;
@@ -39,6 +41,7 @@ public class MainApplication extends Application {
         //注册网络广播监听事件
         IntentFilter filter=new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
         registerReceiver(netWorkReceiver,filter);
+        nativeLiveThemes=new ArrayList<>();
         amatarBitmap= BitmapFactory.decodeResource(getResources(),R.mipmap.ic_amatar_img);
         bigLiveBitmap=BitmapFactory.decodeResource(getResources(),R.drawable.biglivepic);
     }

@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.activity.LiveActivity;
+import com.example.wkj_pc.fitnesslive.activity.PreparedLiveActivity;
 import com.example.wkj_pc.fitnesslive.activity.TakePicActivity;
 
 public class BottomSheetDialogFrag extends BottomSheetDialogFragment {
@@ -29,7 +30,7 @@ public class BottomSheetDialogFrag extends BottomSheetDialogFragment {
         beginlive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(), LiveActivity.class));
+                startActivity(new Intent(getActivity(), PreparedLiveActivity.class));
                 getDialog().cancel();
             }
         });

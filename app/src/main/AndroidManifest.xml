@@ -65,7 +65,8 @@
         <activity android:name=".activity.LiveActivity" />
         <activity android:name=".activity.VideoShootActivity" />
         <activity android:name=".activity.SysMessageActivity" />
-        <activity android:name=".activity.UserInfoEditActivity"/>
+        <activity android:name=".activity.UserInfoEditActivity" />
+
         <service
             android:name=".service.LiveService"
             android:enabled="true"
@@ -77,7 +78,8 @@
             android:screenOrientation="portrait" />
         <activity android:name=".activity.PicResultActivity" />
         <activity android:name=".activity.FindPwdNextActivity" />
-        <activity android:name=".activity.RegisterNextActivity"></activity>
+        <activity android:name=".activity.RegisterNextActivity" />
+        <activity android:name=".activity.PreparedLiveActivity"></activity>
     </application>
 
 </manifest>

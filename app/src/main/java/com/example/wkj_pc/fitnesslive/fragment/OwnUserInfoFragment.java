@@ -188,8 +188,8 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
                 Glide.with(this).load(MainApplication.loginUser.getAmatar())
                         .asBitmap().into(amatarView);
             }
-            ownNickname.setText(MainApplication.loginUser.getNickname());
-            ownAccount.setText(MainApplication.loginUser.getAccount());
+            ownNickname.setText("昵称："+MainApplication.loginUser.getNickname());
+            ownAccount.setText("账号："+MainApplication.loginUser.getAccount());
             ownUserInfoGrade.setText((null==MainApplication.loginUser.getGrade())?"0":
                     MainApplication.loginUser.getGrade().toString());
             ownUserInfoMyAttention.setText((null==MainApplication.loginUser.getAttentionnum())?"0"
