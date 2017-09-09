@@ -18,13 +18,13 @@ import okhttp3.RequestBody;
 
 public class LoginUtils {
 
-
+    /** 获取微博用户信息*/
     public static void getUserInfoWithWeibo(String url, Callback callback){
          Request request=new Request.Builder().url(url)
                  .build();
          OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
     }
-
+    /** 长期请求服务器*/
     public static void toRequestServerForLogin(String requestUrl, String userinfo, String cookie, Callback callback) {
         Request request=null;
         RequestBody body=new FormBody.Builder()
@@ -45,7 +45,7 @@ public class LoginUtils {
                     .post(body).addHeader("cookie",cookie).build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
     }
-    /*退出登录请求*/
+    /**退出登录请求*/
     public static void toRequestQuitLogin(String requestUrl,String content, String cookie) {
         RequestBody body=new FormBody.Builder()
                 .add("user",content).build();
@@ -92,7 +92,7 @@ public class LoginUtils {
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
     }
-
+    /** 用户注册*/
     public static void registerUser(String registerUserUrl, String mobileNum, String password, Callback callback) {
         RequestBody body=new FormBody.Builder()
                 .add("mobilenum",mobileNum)
@@ -103,7 +103,7 @@ public class LoginUtils {
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
     }
-
+    /** 更新用户头像*/
     public static void updateUserAmatar(String updateUserInfoUrl, String account, InputStream inputstream,
                                         Callback callback) {
         byte [] buffer= null;
@@ -123,7 +123,7 @@ public class LoginUtils {
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
     }
-
+    /** 更新用户信息*/
     public static void updateUserEditInfos(String updateUserInfoUrl, String account, String content,
                                            String type, Callback callback) {
         RequestBody body=new FormBody.Builder()
@@ -137,6 +137,7 @@ public class LoginUtils {
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
 
     }
+    /** 更新用户性别*/
     public static void updateUserSex(String updateUserInfoUrl, String account, String content,
                                      Callback callback) {
         RequestBody body = new FormBody.Builder()
@@ -149,7 +150,7 @@ public class LoginUtils {
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
     }
-
+    /** 更新用户直播大图*/
     public static void updateUserLiveBigPicUrl(String updateUserInfoUrl, String account, FileInputStream inputStream, Callback callback) {
         byte [] buffer= null;
         try {
@@ -167,5 +168,17 @@ public class LoginUtils {
                 .post(body)
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
+    /** 更新用户直播风格*/
+    public static void updateLiveUserThemes(String updateUserLiveThemesUrl, int uid, String content, Callback callback) {
+        RequestBody body=new FormBody.Builder()
+                .add("uid",String.valueOf(uid))
+                .add("livethemes", content)
+                .build();
+        Request request=new Request.Builder().url(updateUserLiveThemesUrl)
+                .post(body)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+
     }
 }

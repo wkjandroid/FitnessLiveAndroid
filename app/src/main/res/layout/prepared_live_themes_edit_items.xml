@@ -17,11 +17,12 @@
             android:text="性感"
             android:textSize="20sp"
             android:gravity="center"
-            android:textColor="#5608f2"
+            android:textColor="#545356"
             android:id="@+id/prepared_live_theme_edit_text_view"
             />
         <ImageView
             android:layout_width="0dp"
+            android:id="@+id/prepared_live_theme_edit_destroy_img_view"
             android:layout_weight="1"
             android:layout_height="20dp"
             android:layout_marginRight="5dp"

@@ -3,7 +3,7 @@
     <item>
         <shape android:shape="rectangle">
             <!--填充的颜色-->
-            <solid  android:color="@color/colorSolid"/>
+            <solid  android:color="#eae8e8"/>
             设置按钮的四个圆角为弧形
             <corners android:topRightRadius="10dp"  />
             <!--设置radius为半径-->

@@ -1,5 +1,6 @@
 package com.example.wkj_pc.fitnesslive.activity;
 
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -17,6 +19,7 @@ import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.LiveThemeEditSetAdapter;
 import com.example.wkj_pc.fitnesslive.tools.BottomMenuUtils;
+import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
 import com.example.wkj_pc.fitnesslive.tools.ToastUtils;
 import com.jph.takephoto.app.TakePhoto;
@@ -56,6 +59,7 @@ public class PreparedLiveActivity extends TakePhotoActivity {
     TextView preparedLiveBigImgSetTextView;
     private TakePhoto takePhoto;
     private String updateUserInfoUrl;
+    private String updateUserLiveThemesUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,15 +67,14 @@ public class PreparedLiveActivity extends TakePhotoActivity {
         setContentView(R.layout.activity_prepared_live);
         ButterKnife.bind(this);
         takePhoto = getTakePhoto();
+        updateUserLiveThemesUrl = getResources().getString(R.string.app_customer_live_updateLiveUserStyle);
         updateUserInfoUrl = getResources().getString(R.string.app_update_user_info_url);
+        Glide.with(this).load(MainApplication.loginUser.getLivebigpic()).error(R.drawable.biglivepic).into(preparedLiveBigImgSetImgView);
     }
-
     @Override
     protected void onResume() {
         super.onResume();
-        Glide.with(this).load(MainApplication.loginUser.getLivebigpic()).asBitmap().into(preparedLiveBigImgSetImgView);
         initLiveThemes();
-
     }
     /** 设置直播风格显示 */
     private void initLiveThemes() {
@@ -81,19 +84,32 @@ public class PreparedLiveActivity extends TakePhotoActivity {
         preparedLiveThemeEditShowRecyclerView.setAdapter(adapter);
     }
 
-    @OnClick({R.id.prepared_live_user_back_image_view,R.id.prepared_live_big_img_set_text_view, R.id.prepared_live_set_to_live_text_view, R.id.prepared_live_big_img_set_img_view, R.id.prepared_live_theme_edit_text, R.id.prepared_live_theme_append_button, R.id.prepared_live_theme_edit_show_recycler_view})
+    @OnClick({R.id.prepared_live_user_back_image_view,R.id.prepared_live_big_img_set_text_view,
+            R.id.prepared_live_set_to_live_text_view, R.id.prepared_live_big_img_set_img_view,
+            R.id.prepared_live_theme_append_button})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.prepared_live_set_to_live_text_view:  //准备直播
-                break;
-
-            case R.id.prepared_live_theme_edit_text:    //编辑直播风格
-
-                break;
-                case R.id.prepared_live_theme_append_button://添加直播风格
-
-                break;
-            case R.id.prepared_live_theme_edit_show_recycler_view:
+                String content = GsonUtils.getGson().toJson(MainApplication.nativeLiveThemes);
+                LoginUtils.updateLiveUserThemes(updateUserLiveThemesUrl,MainApplication.loginUser.getUid(),content,new Callback()
+                {
+                    @Override
+                    public void onFailure(Call call, IOException e) {}
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        String responseData = response.body().string();
+                        if (responseData.equals("failed")){
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    ToastUtils.showToast(PreparedLiveActivity.this,"服务器繁忙！",Toast.LENGTH_SHORT);
+                                }
+                            });
+                        }
+                    }
+                });
+                startActivity(new Intent(PreparedLiveActivity.this,LiveActivity.class));
+                finish();
                 break;
             case R.id.prepared_live_big_img_set_text_view:  //弹出 选择大图
                 showBottomSelectorMenu();
@@ -101,12 +117,19 @@ public class PreparedLiveActivity extends TakePhotoActivity {
             case R.id.prepared_live_big_img_set_img_view:   //弹出 选择大图
                 showBottomSelectorMenu();
                 break;
+            case R.id.prepared_live_theme_append_button://添加直播风格
+                if (!TextUtils.isEmpty(preparedLiveThemeEditText.getText().toString())){
+                    MainApplication.nativeLiveThemes.add(preparedLiveThemeEditText.getText().toString());
+                    preparedLiveThemeEditShowRecyclerView.scrollToPosition(MainApplication.nativeLiveThemes.size()-1);
+                    preparedLiveThemeEditText.setText("");
+                }
+                break;
             case R.id.prepared_live_user_back_image_view:   //设置直播信息返回
                 finish();
                 break;
         }
     }
-
+    /** 弹出底部菜单选项，选择获取图片方法*/
     private void showBottomSelectorMenu() {
         getWindow().setBackgroundDrawable( new ColorDrawable(getResources().getColor(R.color.bottom_menu)));
         BottomMenuUtils bottomMenuUtils=new BottomMenuUtils(this, new View.OnClickListener() {
@@ -135,7 +158,6 @@ public class PreparedLiveActivity extends TakePhotoActivity {
         });
         bottomMenuUtils.show();
     }
-
     @Override
     public void takeCancel() {
         super.takeCancel();
@@ -155,6 +177,7 @@ public class PreparedLiveActivity extends TakePhotoActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                /** 展示用户大图片*/
                 Glide.with(PreparedLiveActivity.this).load(file).error(R.drawable.head_img).into(preparedLiveBigImgSetImgView);
             }
         });
@@ -164,6 +187,7 @@ public class PreparedLiveActivity extends TakePhotoActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        //更新用户直播大图
         LoginUtils.updateUserLiveBigPicUrl(updateUserInfoUrl, MainApplication.loginUser.getAccount(),
                 inputStream, new Callback(){
                     @Override
@@ -176,12 +200,13 @@ public class PreparedLiveActivity extends TakePhotoActivity {
                                 @Override
                                 public void run() {
                                     ToastUtils.showToast(PreparedLiveActivity.this,"修改失败", Toast.LENGTH_SHORT);
-                                    preparedLiveBigImgSetImgView.setImageBitmap(BitmapFactory.decodeResource(getResources(),R.mipmap.ic_amatar_img));
+                                    preparedLiveBigImgSetImgView.setImageBitmap(BitmapFactory.
+                                            decodeResource(getResources(),R.mipmap.ic_amatar_img));
                                 }
                             });
                         }else if (responseData.contains("true:")){
                             String amatarUrl = responseData.substring(5);
-                            MainApplication.loginUser.setAmatar(amatarUrl);
+                            MainApplication.loginUser.setLivebigpic(amatarUrl);
                         }
                     }
                 });

@@ -79,7 +79,8 @@
         <activity android:name=".activity.PicResultActivity" />
         <activity android:name=".activity.FindPwdNextActivity" />
         <activity android:name=".activity.RegisterNextActivity" />
-        <activity android:name=".activity.PreparedLiveActivity"></activity>
+        <activity android:name=".activity.PreparedLiveActivity" />
+        <activity android:name=".activity.TakeVideoActivity"></activity>
     </application>
 
 </manifest>
