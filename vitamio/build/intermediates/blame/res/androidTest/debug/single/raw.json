@@ -4,6 +4,10 @@
         "source": "E:\\androidProject\\mycode\\FitnessLive\\vitamio\\build\\intermediates\\bundles\\debug\\res\\raw\\libarm.so"
     },
     {
+        "merged": "F:\\project\\android\\mycode\\FitnessLive\\vitamio\\build\\intermediates\\res\\merged\\androidTest\\debug\\raw\\libarm.so",
+        "source": "F:\\project\\android\\mycode\\FitnessLive\\vitamio\\build\\intermediates\\bundles\\debug\\res\\raw\\libarm.so"
+    },
+    {
         "merged": "E:\\androidProject\\FitnessLive\\vitamio\\build\\intermediates\\res\\merged\\androidTest\\debug\\raw\\libarm.so",
         "source": "E:\\androidProject\\FitnessLive\\vitamio\\build\\intermediates\\bundles\\debug\\res\\raw\\libarm.so"
     }
