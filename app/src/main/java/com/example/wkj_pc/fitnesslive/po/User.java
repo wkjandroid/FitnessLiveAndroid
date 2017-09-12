@@ -22,7 +22,11 @@ public class User extends DataSupport{
     private String token;
     private Boolean islive;
     private String personalsign;
-
+    private Integer fansnum;//粉丝数量
+    private Integer grade;  //用户积分
+    private Integer attentionnum;  //我的关注数量
+    private String livebigpic;  //直播大图
+    private String createtime;
     public String getPersonalsign() {
         return personalsign;
     }
@@ -30,14 +34,6 @@ public class User extends DataSupport{
     public void setPersonalsign(String personalsign) {
         this.personalsign = personalsign;
     }
-
-    private Integer fansnum;//粉丝数量
-    private Integer grade;  //用户积分
-    private Integer attentionnum;  //我的关注数量
-    private String livebigpic;  //直播大图
-    private String createtime;
-
-
 
     public String getCreatetime() {
         return createtime;

@@ -69,7 +69,8 @@ public class PreparedLiveActivity extends TakePhotoActivity {
         takePhoto = getTakePhoto();
         updateUserLiveThemesUrl = getResources().getString(R.string.app_customer_live_updateLiveUserStyle);
         updateUserInfoUrl = getResources().getString(R.string.app_update_user_info_url);
-        Glide.with(this).load(MainApplication.loginUser.getLivebigpic()).error(R.drawable.biglivepic).into(preparedLiveBigImgSetImgView);
+        Glide.with(this).load(MainApplication.loginUser.getLivebigpic()).
+                error(R.drawable.biglivepic).into(preparedLiveBigImgSetImgView);
     }
     @Override
     protected void onResume() {

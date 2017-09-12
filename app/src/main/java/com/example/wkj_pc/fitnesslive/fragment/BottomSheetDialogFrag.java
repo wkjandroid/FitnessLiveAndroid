@@ -9,9 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.example.wkj_pc.fitnesslive.R;
-import com.example.wkj_pc.fitnesslive.activity.LiveActivity;
 import com.example.wkj_pc.fitnesslive.activity.PreparedLiveActivity;
-import com.example.wkj_pc.fitnesslive.activity.TakePicActivity;
 import com.example.wkj_pc.fitnesslive.activity.TakeVideoActivity;
 
 /** 弹出直播或者拍摄菜单 */

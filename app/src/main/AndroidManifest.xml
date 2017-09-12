@@ -63,7 +63,6 @@
             android:launchMode="singleTop" />
         <activity android:name=".activity.VideoPlayerActivity" />
         <activity android:name=".activity.LiveActivity" />
-        <activity android:name=".activity.VideoShootActivity" />
         <activity android:name=".activity.SysMessageActivity" />
         <activity android:name=".activity.UserInfoEditActivity" />
 
@@ -81,6 +80,7 @@
         <activity android:name=".activity.RegisterNextActivity" />
         <activity android:name=".activity.PreparedLiveActivity" />
         <activity android:name=".activity.TakeVideoActivity"></activity>
+        <activity android:name=".activity.UploadVideoActivity"/>
     </application>
 
 </manifest>
