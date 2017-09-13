@@ -79,8 +79,11 @@
         <activity android:name=".activity.FindPwdNextActivity" />
         <activity android:name=".activity.RegisterNextActivity" />
         <activity android:name=".activity.PreparedLiveActivity" />
-        <activity android:name=".activity.TakeVideoActivity"></activity>
-        <activity android:name=".activity.UploadVideoActivity"/>
+        <activity android:name=".activity.TakeVideoActivity" />
+        <activity android:name=".activity.UploadVideoActivity" />
+        <activity android:name=".activity.OwnUploadVideoActivity" />
+        <activity android:name=".activity.UploadNativeVideoActivity" />
+        <activity android:name=".activity.WatchUserLiveActivity" />
     </application>
 
 </manifest>

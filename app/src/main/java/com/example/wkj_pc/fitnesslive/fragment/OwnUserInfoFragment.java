@@ -25,6 +25,7 @@ import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.activity.LoginActivity;
 import com.example.wkj_pc.fitnesslive.activity.MainActivity;
+import com.example.wkj_pc.fitnesslive.activity.OwnUploadVideoActivity;
 import com.example.wkj_pc.fitnesslive.activity.SysMessageActivity;
 import com.example.wkj_pc.fitnesslive.activity.UserInfoEditActivity;
 import com.example.wkj_pc.fitnesslive.service.LiveService;
@@ -158,6 +159,8 @@ public class OwnUserInfoFragment extends Fragment implements View.OnClickListene
             case R.id.own_user_video_linearlayout:   //个人视频
                 if (null==MainApplication.loginUser){
                     startActivity(new Intent(getActivity(),LoginActivity.class));
+                }else {
+                    startActivity(new Intent(getActivity(),OwnUploadVideoActivity.class));
                 }
                 break;
             case R.id.own_user_info_amatar_account_linearlayout:

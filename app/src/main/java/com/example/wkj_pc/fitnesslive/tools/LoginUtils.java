@@ -3,9 +3,12 @@ package com.example.wkj_pc.fitnesslive.tools;
 import android.util.Base64;
 
 
+import com.example.wkj_pc.fitnesslive.po.UploadVideo;
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import okhttp3.Callback;
 import okhttp3.FormBody;
@@ -180,5 +183,15 @@ public class LoginUtils {
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
 
+    }
+    /** 获取用户上传的视频*/
+    public static void getUserUploadVideos(String getUploadVideoUrl,int uid,Callback callback) {
+        RequestBody body=new FormBody.Builder()
+                .add("uid",String.valueOf(uid))
+                .build();
+        Request request=new Request.Builder().url(getUploadVideoUrl)
+                .post(body)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
     }
 }
