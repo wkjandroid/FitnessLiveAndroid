@@ -39,13 +39,23 @@
             android:textSize="20dp"
             android:textColor="#f6f8f9"
             android:layout_marginRight="10dp"
-            >
-        </TextView>
+           />
     </android.support.v7.widget.Toolbar>
     <!--用户个人上传视频展示-->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/user_upload_video_show_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></android.support.v7.widget.RecyclerView>
+        android:layout_height="match_parent"
+        >
+    </android.support.v7.widget.RecyclerView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/user_upload_video_show_bg_linearlayout"
+        android:visibility="gone"
+        android:background="@drawable/upload_video_empty_show"
+        android:layout_height="match_parent">
+    </LinearLayout>
+
 
 </LinearLayout>

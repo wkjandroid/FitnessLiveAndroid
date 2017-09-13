@@ -55,8 +55,9 @@ public class UserUploadVideoShowAdapter extends RecyclerView.Adapter<UserUploadV
     }
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        if (!TextUtils.isEmpty(uploadVideos.get(position).getTitile())){
-            holder.titleTextView.setText(uploadVideos.get(position).getTitile());
+
+        if (!TextUtils.isEmpty(uploadVideos.get(position).getTitle())){
+            holder.titleTextView.setText(uploadVideos.get(position).getTitle());
         }
         Glide.with(context).load(uploadVideos.get(position).getThumbnailurl()).asBitmap().into(holder.videoImageView);
     }

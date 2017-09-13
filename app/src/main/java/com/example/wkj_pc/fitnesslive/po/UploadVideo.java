@@ -6,7 +6,7 @@ package com.example.wkj_pc.fitnesslive.po;
 
 public class UploadVideo {
     private int vid;    //视频id
-    private String titile;  //视频标题
+    private String title;  //视频标题
     private String videourl;    //视频地址
     private String thumbnailurl;    //视频缩略图地址
     private String uploadtime;      //上传时间
@@ -28,12 +28,12 @@ public class UploadVideo {
         this.vid = vid;
     }
 
-    public String getTitile() {
-        return titile;
+    public String getTitle() {
+        return title;
     }
 
-    public void setTitile(String titile) {
-        this.titile = titile;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public String getVideourl() {
