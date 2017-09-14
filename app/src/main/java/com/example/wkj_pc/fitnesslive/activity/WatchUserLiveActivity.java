@@ -52,7 +52,7 @@ public class WatchUserLiveActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_video_player);
+        setContentView(R.layout.activity_watch_user_live);
         ButterKnife.bind(this);
         if (!LibsChecker.checkVitamioLibs(this))
             return;

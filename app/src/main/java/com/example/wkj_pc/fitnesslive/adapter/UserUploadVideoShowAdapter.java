@@ -42,6 +42,7 @@ public class UserUploadVideoShowAdapter extends RecyclerView.Adapter<UserUploadV
                     UploadVideo uploadVideo = uploadVideos.get(getAdapterPosition());
                     Intent intent = new Intent(context, VideoPlayerActivity.class);
                     intent.putExtra("videourl",uploadVideo.getVideourl());
+                    intent.putExtra("thumbnailurl",uploadVideo.getThumbnailurl());
                     context.startActivity(intent);
                 }
             });
