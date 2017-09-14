@@ -18,20 +18,20 @@
     <string name="app_edit_comment_text">请输入信息</string>
     <string name="app_video_upload_srs_server_url">rtmp://119.29.154.229:1935/live/livestreams</string>
 
-    <string name="app_message_websocket_url_edit">ws://192.168.191.1/websocket/</string>
+    <string name="app_message_websocket_url_edit">ws://172.18.163.123/websocket/</string>
 
-    <string name="app_longrequest_url">192.168.191.1</string>
-    <string name="app_customer_register_user_url">http://192.168.191.1/customer/login/registerUser</string>
-    <string name="app_customer_user_update_password_url">http://192.168.191.1/customer/login/updateUserPassword</string>
-    <string name="app_get_verifycode_url">http://192.168.191.1/customer/login/getVerifycode</string>
-    <string name="app_login_url">http://192.168.191.1/customer/login/toLogin</string>
-    <string name="app_get_user_info_url">http://192.168.191.1/customer/login/getUserInfo</string>
-    <string name="app_destroy_url">http://192.168.191.1/customer/login/quitLogin</string>
-    <string name="app_update_user_info_url">http://192.168.191.1/customer/login/updateUserInfo</string>
-    <string name="app_customer_live_updateLiveUserStyle">http://192.168.191.1/customer/live/updateLiveUserStyle</string>
-    <string name="app_customer_live_getHomeLiveUserInfos_url">http://192.168.191.1/customer/live/getHomeLiveUserInfos</string>
-    <string name="app_customer_live_getHomeLivetags_url">http://192.168.191.1/customer/live/getHomeUserLiveThemes</string>
-    <string name="app_customer_live_uploadUserVideoUrl">http://192.168.191.1/customer/live/uploadRecoderVideo</string>
-    <string name="app_customer_live_getUserUploadVideoUrl">http://192.168.191.1/customer/live/getUserUploadVideo</string>
+    <string name="app_longrequest_url">172.18.163.123</string>
+    <string name="app_customer_register_user_url">http://172.18.163.123/customer/login/registerUser</string>
+    <string name="app_customer_user_update_password_url">http://172.18.163.123/customer/login/updateUserPassword</string>
+    <string name="app_get_verifycode_url">http://172.18.163.123/customer/login/getVerifycode</string>
+    <string name="app_login_url">http://172.18.163.123/customer/login/toLogin</string>
+    <string name="app_get_user_info_url">http://172.18.163.123/customer/login/getUserInfo</string>
+    <string name="app_destroy_url">http://172.18.163.123/customer/login/quitLogin</string>
+    <string name="app_update_user_info_url">http://172.18.163.123/customer/login/updateUserInfo</string>
+    <string name="app_customer_live_updateLiveUserStyle">http://172.18.163.123/customer/live/updateLiveUserStyle</string>
+    <string name="app_customer_live_getHomeLiveUserInfos_url">http://172.18.163.123/customer/live/getHomeLiveUserInfos</string>
+    <string name="app_customer_live_getHomeLivetags_url">http://172.18.163.123/customer/live/getHomeUserLiveThemes</string>
+    <string name="app_customer_live_uploadUserVideoUrl">http://172.18.163.123/customer/live/uploadRecoderVideo</string>
+    <string name="app_customer_live_getUserUploadVideoUrl">http://172.18.163.123/customer/live/getUserUploadVideo</string>
 
 </resources>
