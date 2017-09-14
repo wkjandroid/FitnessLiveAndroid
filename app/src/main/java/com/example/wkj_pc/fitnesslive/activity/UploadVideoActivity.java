@@ -1,5 +1,6 @@
 package com.example.wkj_pc.fitnesslive.activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.os.Bundle;
@@ -35,9 +36,9 @@ public class UploadVideoActivity extends AppCompatActivity {
     EditText userUploadVideoTitleEditText;
     @BindView(R.id.user_upload_video_thumbnails_img_view)
     ImageView userUploadVideoThumbnailsImgView;
-    private String uploadVideoUrl;
-    private String path;
-    private Bitmap videoThumbnail;
+    private String uploadVideoUrl;  //上传服务器地址
+    private String path;    //视频地址
+    private Bitmap videoThumbnail; //视频缩略图显示
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         path = getIntent().getStringExtra("path");
         initThumbnails();
     }
+    /** 初始化缩略图 */
     public void initThumbnails(){
         videoThumbnail = ThumbnailUtils.createVideoThumbnail(path, MICRO_KIND);
         userUploadVideoThumbnailsImgView.setImageBitmap(videoThumbnail);
@@ -61,7 +63,9 @@ public class UploadVideoActivity extends AppCompatActivity {
                 uploadImg(path,videoThumbnail);
                 break;
             case R.id.user_upload_video_thumbnails_img_view:    //点击缩略图观看视频
-
+                Intent intent = new Intent(this, VideoPlayerActivity.class);
+                intent.putExtra("videourl",path);
+                startActivity(intent);
                 break;
             case R.id.tools_user_info_edit_cancel_text_view:    //取消上传
                 finish();
