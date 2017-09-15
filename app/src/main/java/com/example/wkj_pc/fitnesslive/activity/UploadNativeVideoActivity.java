@@ -14,16 +14,12 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.UploadNativeVideoAdapter;
 import com.example.wkj_pc.fitnesslive.po.UploadVideo;
 import com.example.wkj_pc.fitnesslive.tools.ToastUtils;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -87,7 +83,7 @@ public class UploadNativeVideoActivity extends AppCompatActivity {
         } else {
             uploadNativeVideoShowImageView.setVisibility(View.GONE);
             uploadNativeVideoChooseRecyclerView.setVisibility(View.VISIBLE);
-            UploadNativeVideoAdapter adapter = new UploadNativeVideoAdapter(nativeVideos);
+            UploadNativeVideoAdapter adapter = new UploadNativeVideoAdapter(nativeVideos,this);
             StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
             uploadNativeVideoChooseRecyclerView.setAdapter(adapter);
             uploadNativeVideoChooseRecyclerView.setLayoutManager(manager);

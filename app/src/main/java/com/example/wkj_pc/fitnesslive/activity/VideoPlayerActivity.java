@@ -20,9 +20,6 @@ public class VideoPlayerActivity extends AppCompatActivity {
         jcVideoPlayerStandard.setUp(videourl,JCVideoPlayer.SCREEN_WINDOW_FULLSCREEN,"");
         ImageView videoView = jcVideoPlayerStandard.thumbImageView;
         Glide.with(this).load(thumbnailurl).asBitmap().into(videoView);
-        int max = jcVideoPlayerStandard.bottomProgressBar.getMax();
-        int progress = jcVideoPlayerStandard.bottomProgressBar.getProgress();
-        System.out.println(max+"-------------"+progress);
         jcVideoPlayerStandard.backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

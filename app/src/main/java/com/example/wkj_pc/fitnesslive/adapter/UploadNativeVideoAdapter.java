@@ -25,8 +25,9 @@ public class UploadNativeVideoAdapter extends RecyclerView.Adapter<UploadNativeV
     private final List<UploadVideo> videos;
     private Context context;
 
-    public UploadNativeVideoAdapter(List<UploadVideo> videos) {
+    public UploadNativeVideoAdapter(List<UploadVideo> videos,Context context) {
         this.videos=videos;
+        this.context=context;
     }
     class ViewHolder extends RecyclerView.ViewHolder{
         private ImageView videoImageView;
@@ -41,7 +42,7 @@ public class UploadNativeVideoAdapter extends RecyclerView.Adapter<UploadNativeV
                     for (UploadVideo video:videos){
                         video.setIsselected(false);
                     }
-                    videos.get(getAdapterPosition()).setIsselected(true);
+//                    videos.get(getAdapterPosition()).setIsselected(true);
                     notifyDataSetChanged();
                 }
             });
@@ -49,7 +50,6 @@ public class UploadNativeVideoAdapter extends RecyclerView.Adapter<UploadNativeV
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.upload_native_video_show_items, parent, false);
         return new ViewHolder(view);
     }
