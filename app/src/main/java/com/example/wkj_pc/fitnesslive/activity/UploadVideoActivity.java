@@ -28,7 +28,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import okhttp3.Call;
 
-import static android.provider.MediaStore.Video.Thumbnails.MICRO_KIND;
+import static android.provider.MediaStore.Video.Thumbnails.MINI_KIND;
 
 public class UploadVideoActivity extends AppCompatActivity {
 
@@ -51,7 +51,7 @@ public class UploadVideoActivity extends AppCompatActivity {
     }
     /** 初始化缩略图 */
     public void initThumbnails(){
-        videoThumbnail = ThumbnailUtils.createVideoThumbnail(path, MICRO_KIND);
+        videoThumbnail = ThumbnailUtils.createVideoThumbnail(path, MINI_KIND);
         userUploadVideoThumbnailsImgView.setImageBitmap(videoThumbnail);
     }
     @OnClick({R.id.tools_user_info_edit_cancel_text_view,

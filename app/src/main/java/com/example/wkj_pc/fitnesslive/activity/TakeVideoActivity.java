@@ -1,13 +1,11 @@
 package com.example.wkj_pc.fitnesslive.activity;
 
-import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -21,7 +19,6 @@ import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.tools.MediaUtils;
 import com.example.wkj_pc.fitnesslive.widget.SendView;
 import com.example.wkj_pc.fitnesslive.widget.VideoProgressBar;
-import com.werb.permissionschecker.PermissionChecker;
 
 import java.util.UUID;
 
