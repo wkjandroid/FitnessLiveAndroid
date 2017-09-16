@@ -1,11 +1,13 @@
 package com.example.wkj_pc.fitnesslive.activity;
 
+import android.Manifest;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,11 +17,11 @@ import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.tools.MediaUtils;
 import com.example.wkj_pc.fitnesslive.widget.SendView;
 import com.example.wkj_pc.fitnesslive.widget.VideoProgressBar;
+import com.werb.permissionschecker.PermissionChecker;
 
 import java.util.UUID;
 
@@ -30,16 +32,20 @@ public class TakeVideoActivity extends AppCompatActivity {
     private boolean isCancel;
     private VideoProgressBar progressBar;
     private int mProgress;
-    private TextView btnInfo , btn;
-    private TextView view;
+    private TextView btnInfo, btn;
     private SendView send;
     private RelativeLayout recordLayout, switchLayout;
+    private SurfaceView surfaceView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_video);
-        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.main_surface_view);
+        surfaceView = (SurfaceView) findViewById(R.id.main_surface_view);
+        startVideo(surfaceView);
+    }
+
+    private void startVideo(SurfaceView surfaceView) {
         // setting
         mediaUtils = new MediaUtils(this);
         mediaUtils.setRecorderType(MediaUtils.MEDIA_VIDEO);
@@ -72,13 +78,11 @@ public class TakeVideoActivity extends AppCompatActivity {
         progressBar.setOnProgressEndListener(listener);
         progressBar.setCancel(true);
     }
-
     @Override
     protected void onResume() {
         super.onResume();
         progressBar.setCancel(true);
     }
-
     View.OnTouchListener btnTouch = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -125,12 +129,10 @@ public class TakeVideoActivity extends AppCompatActivity {
                             break;
                     }
                 }
-
             }
             return ret;
         }
     };
-
     VideoProgressBar.OnProgressEndListener listener = new VideoProgressBar.OnProgressEndListener() {
         @Override
         public void onProgressEndListener() {
@@ -138,7 +140,6 @@ public class TakeVideoActivity extends AppCompatActivity {
             mediaUtils.stopRecordSave();
         }
     };
-
     Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -153,56 +154,50 @@ public class TakeVideoActivity extends AppCompatActivity {
             }
         }
     };
-
-    private void startView(){
+    private void startView() {
         startAnim();
         mProgress = 0;
         handler.removeMessages(0);
         handler.sendMessage(handler.obtainMessage(0));
     }
-
-    private void moveView(){
-        if(isCancel){
+    private void moveView() {
+        if (isCancel) {
             btnInfo.setText("松手取消");
-        }else {
+        } else {
             btnInfo.setText("上滑取消");
         }
     }
-
-    private void stopView(boolean isSave){
+    private void stopView(boolean isSave) {
         stopAnim();
         progressBar.setCancel(true);
         mProgress = 0;
         handler.removeMessages(0);
         btnInfo.setText("双击放大");
-        if(isSave) {
+        if (isSave) {
             recordLayout.setVisibility(View.GONE);
             send.startAnim();
         }
     }
-
-    private void startAnim(){
+    private void startAnim() {
         AnimatorSet set = new AnimatorSet();
         set.playTogether(
-                ObjectAnimator.ofFloat(btn,"scaleX",1,0.5f),
-                ObjectAnimator.ofFloat(btn,"scaleY",1,0.5f),
-                ObjectAnimator.ofFloat(progressBar,"scaleX",1,1.3f),
-                ObjectAnimator.ofFloat(progressBar,"scaleY",1,1.3f)
+                ObjectAnimator.ofFloat(btn, "scaleX", 1, 0.5f),
+                ObjectAnimator.ofFloat(btn, "scaleY", 1, 0.5f),
+                ObjectAnimator.ofFloat(progressBar, "scaleX", 1, 1.3f),
+                ObjectAnimator.ofFloat(progressBar, "scaleY", 1, 1.3f)
         );
         set.setDuration(250).start();
     }
-
-    private void stopAnim(){
+    private void stopAnim() {
         AnimatorSet set = new AnimatorSet();
         set.playTogether(
-                ObjectAnimator.ofFloat(btn,"scaleX",0.5f,1f),
-                ObjectAnimator.ofFloat(btn,"scaleY",0.5f,1f),
-                ObjectAnimator.ofFloat(progressBar,"scaleX",1.3f,1f),
-                ObjectAnimator.ofFloat(progressBar,"scaleY",1.3f,1f)
+                ObjectAnimator.ofFloat(btn, "scaleX", 0.5f, 1f),
+                ObjectAnimator.ofFloat(btn, "scaleY", 0.5f, 1f),
+                ObjectAnimator.ofFloat(progressBar, "scaleX", 1.3f, 1f),
+                ObjectAnimator.ofFloat(progressBar, "scaleY", 1.3f, 1f)
         );
         set.setDuration(250).start();
     }
-
     private View.OnClickListener backClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -211,18 +206,16 @@ public class TakeVideoActivity extends AppCompatActivity {
             mediaUtils.deleteTargetFile();
         }
     };
-
     private View.OnClickListener selectClick = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             String path = mediaUtils.getTargetFilePath();
             send.stopAnim();
             recordLayout.setVisibility(View.VISIBLE);
-            Intent intent=new Intent(TakeVideoActivity.this,UploadVideoActivity.class);
-            intent.putExtra("path",path);
+            Intent intent = new Intent(TakeVideoActivity.this, UploadVideoActivity.class);
+            intent.putExtra("path", path);
             startActivity(intent);
             finish();
         }
     };
-
 }

@@ -48,5 +48,6 @@ dependencies {
     compile 'com.kyleduo.switchbutton:library:1.4.6'
     compile 'com.jph.takephoto:takephoto_library:4.0.3'
     testCompile 'junit:junit:4.12'
+    compile 'com.werb.permissionschecker:permissionschecker:0.0.1-beta2'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
 }
