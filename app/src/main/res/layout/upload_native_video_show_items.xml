@@ -15,15 +15,15 @@
             android:src="@drawable/biglivepic"
             android:scaleType="centerCrop"
             />
-        <CheckBox
+        <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignParentRight="true"
             android:layout_marginRight="5dp"
             android:layout_marginTop="5dp"
-            android:button="@drawable/shape_check_box_video_selector"
+            android:src="@drawable/shape_check_box_video_selector"
             android:layout_alignRight="@+id/upload_native_video_show_image_view"
-            android:id="@+id/upload_native_video_show_check_box"
+            android:id="@+id/upload_native_video_check_img_view"
             />
     </RelativeLayout>
 </LinearLayout>

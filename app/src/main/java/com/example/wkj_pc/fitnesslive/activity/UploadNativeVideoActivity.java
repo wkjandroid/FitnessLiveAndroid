@@ -5,6 +5,8 @@ import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -34,6 +36,18 @@ public class UploadNativeVideoActivity extends AppCompatActivity {
     RecyclerView uploadNativeVideoChooseRecyclerView;
     @BindView(R.id.upload_native_video_show_image_view)
     ImageView uploadNativeVideoShowImageView;
+    private Handler handler=new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            switch (msg.what){
+                case 1:
+                    initRecyclerView();
+                    break;
+            }
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +80,7 @@ public class UploadNativeVideoActivity extends AppCompatActivity {
                 Intent intent = new Intent(this, UploadVideoActivity.class);
                 intent.putExtra("path", path);
                 startActivity(intent);
+                finish();
                 break;
             case R.id.user_upload_native_video_cancel_text_view:
                 finish();
@@ -83,7 +98,7 @@ public class UploadNativeVideoActivity extends AppCompatActivity {
         } else {
             uploadNativeVideoShowImageView.setVisibility(View.GONE);
             uploadNativeVideoChooseRecyclerView.setVisibility(View.VISIBLE);
-            UploadNativeVideoAdapter adapter = new UploadNativeVideoAdapter(nativeVideos,this);
+            UploadNativeVideoAdapter adapter = new UploadNativeVideoAdapter(nativeVideos,getApplicationContext());
             StaggeredGridLayoutManager manager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
             uploadNativeVideoChooseRecyclerView.setAdapter(adapter);
             uploadNativeVideoChooseRecyclerView.setLayoutManager(manager);

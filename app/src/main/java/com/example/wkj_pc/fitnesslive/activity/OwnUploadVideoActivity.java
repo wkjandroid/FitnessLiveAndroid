@@ -43,12 +43,17 @@ public class OwnUploadVideoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_own_upload_video);
         ButterKnife.bind(this);
         getUploadVideoUrl = getResources().getString(R.string.app_customer_live_getUserUploadVideoUrl);
-        getUploadVideo(getUploadVideoUrl, MainApplication.loginUser.getUid());
+        if (null !=MainApplication.loginUser){
+            getUploadVideo(getUploadVideoUrl, MainApplication.loginUser.getUid());
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        if (null !=MainApplication.loginUser){
+            getUploadVideo(getUploadVideoUrl, MainApplication.loginUser.getUid());
+        }
         initRecyclerView();
     }
     /**显示用户上传的视频进行显示*/
