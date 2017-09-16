@@ -224,9 +224,9 @@ public class PreparedLiveActivity extends TakePhotoActivity {
         boolean enableRawFile=true;
         CompressConfig config;
         LubanOptions option=new LubanOptions.Builder()
-                .setMaxHeight(150)
-                .setMaxWidth(150)
-                .setMaxSize(180)
+                .setMaxHeight(500)
+                .setMaxWidth(500)
+                .setMaxSize(850)
                 .create();
         config= CompressConfig.ofLuban(option);
         config.enableReserveRaw(enableRawFile);
@@ -236,7 +236,7 @@ public class PreparedLiveActivity extends TakePhotoActivity {
     private CropOptions getCropOptions(){
         boolean withWonCrop=true;
         CropOptions.Builder builder=new CropOptions.Builder();
-        builder.setOutputX(150).setOutputY(150);
+        builder.setOutputX(500).setOutputY(500);
         builder.setWithOwnCrop(withWonCrop);
         return builder.create();
     }

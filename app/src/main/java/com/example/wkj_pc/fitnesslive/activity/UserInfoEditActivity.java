@@ -194,9 +194,9 @@ public class UserInfoEditActivity extends TakePhotoActivity {
         boolean enableRawFile=true;
         CompressConfig config;
         LubanOptions option=new LubanOptions.Builder()
-                .setMaxHeight(150)
-                .setMaxWidth(150)
-                .setMaxSize(180)
+                .setMaxHeight(400)
+                .setMaxWidth(400)
+                .setMaxSize(700)
                 .create();
         config= CompressConfig.ofLuban(option);
         config.enableReserveRaw(enableRawFile);
@@ -206,7 +206,7 @@ public class UserInfoEditActivity extends TakePhotoActivity {
     private CropOptions getCropOptions(){
         boolean withWonCrop=true;
         CropOptions.Builder builder=new CropOptions.Builder();
-        builder.setOutputX(150).setOutputY(150);
+        builder.setOutputX(400).setOutputY(400);
         builder.setWithOwnCrop(withWonCrop);
         return builder.create();
     }

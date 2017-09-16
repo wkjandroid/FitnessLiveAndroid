@@ -28,5 +28,16 @@ public class VideoPlayerActivity extends AppCompatActivity {
         });
         jcVideoPlayerStandard.startVideo();
     }
-
+    @Override
+    public void onBackPressed() {
+        if (JCVideoPlayer.backPress()) {
+            return;
+        }
+        super.onBackPressed();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        JCVideoPlayer.releaseAllVideos();
+    }
 }
