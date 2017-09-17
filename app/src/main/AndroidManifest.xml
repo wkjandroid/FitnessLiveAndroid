@@ -27,7 +27,6 @@
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -37,10 +36,8 @@
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-
                 <data android:scheme="1106140497" />
             </intent-filter>
         </activity>
@@ -48,12 +45,6 @@
             android:name="com.tencent.connect.common.AssistActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-
-        <service
-            android:name=".service.LoginService"
-            android:enabled="true"
-            android:exported="true" />
-
         <activity android:name=".activity.RegisterActivity" />
         <activity android:name=".activity.LoginActivity" />
         <activity android:name=".activity.FindPasswordActivity" />
@@ -67,10 +58,6 @@
         <activity android:name=".activity.LiveActivity" android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".activity.SysMessageActivity" />
         <activity android:name=".activity.UserInfoEditActivity" />
-        <service
-            android:name=".service.LiveService"
-            android:enabled="true"
-            android:exported="true" />
         <activity
             android:name=".activity.TakePicActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -84,6 +71,15 @@
         <activity android:name=".activity.OwnUploadVideoActivity" />
         <activity android:name=".activity.UploadNativeVideoActivity" />
         <activity android:name=".activity.WatchUserLiveActivity" android:windowSoftInputMode="adjustPan" />
+
+        <service
+            android:name=".service.LoginService"
+            android:enabled="true"
+            android:exported="true" />
+        <service
+            android:name=".service.LiveService"
+            android:enabled="true"
+            android:exported="true" />
     </application>
 
 </manifest>

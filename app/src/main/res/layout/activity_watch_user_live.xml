@@ -10,7 +10,6 @@
         android:id="@+id/watch_video_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#FFF"
         />
     <LinearLayout
         android:layout_width="match_parent"
