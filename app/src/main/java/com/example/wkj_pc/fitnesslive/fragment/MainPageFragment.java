@@ -26,6 +26,7 @@ import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.activity.LoginActivity;
 import com.example.wkj_pc.fitnesslive.activity.MainActivity;
 import com.example.wkj_pc.fitnesslive.activity.SysMessageActivity;
+import com.example.wkj_pc.fitnesslive.activity.WatchUserLiveActivity;
 import com.example.wkj_pc.fitnesslive.adapter.HomeLiveVideoShowAdapter;
 import com.example.wkj_pc.fitnesslive.po.LiveTheme;
 import com.example.wkj_pc.fitnesslive.po.User;
@@ -138,7 +139,8 @@ public class MainPageFragment extends Fragment implements View.OnClickListener{
                 }
                 break;
             case R.id.home_message_receive_btn:     //打开系统消息处理activity
-                startActivity(new Intent(getActivity(), SysMessageActivity.class));
+                startActivity(new Intent(getActivity(), WatchUserLiveActivity.class));
+                //startActivity(new Intent(getActivity(), SysMessageActivity.class));
                 break;
             case R.id.home_user_search_img_view:
                 break;

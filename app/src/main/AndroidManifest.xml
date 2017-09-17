@@ -64,15 +64,13 @@
         <activity android:name=".activity.VideoPlayerActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.LiveActivity" />
+        <activity android:name=".activity.LiveActivity" android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".activity.SysMessageActivity" />
         <activity android:name=".activity.UserInfoEditActivity" />
-
         <service
             android:name=".service.LiveService"
             android:enabled="true"
             android:exported="true" />
-
         <activity
             android:name=".activity.TakePicActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -85,7 +83,7 @@
         <activity android:name=".activity.UploadVideoActivity" />
         <activity android:name=".activity.OwnUploadVideoActivity" />
         <activity android:name=".activity.UploadNativeVideoActivity" />
-        <activity android:name=".activity.WatchUserLiveActivity" />
+        <activity android:name=".activity.WatchUserLiveActivity" android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>
