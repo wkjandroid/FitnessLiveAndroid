@@ -27,7 +27,7 @@
     <string name="app_login_url">http://192.168.191.1/customer/login/toLogin</string>
     <string name="app_get_user_info_url">http://192.168.191.1/customer/login/getUserInfo</string>
     <string name="app_destroy_url">http://192.168.191.1/customer/login/quitLogin</string>
-    <string name="app_update_user_info_url">http://192.168.191.1/customer/login/updateUserInfo</string>
+    <string name="app_update_user_info_url">http://172.18.163.192.168.191.1/customer/login/updateUserInfo</string>
     <string name="app_customer_live_updateLiveUserStyle">http://192.168.191.1/customer/live/updateLiveUserStyle</string>
     <string name="app_customer_live_getHomeLiveUserInfos_url">http://192.168.191.1/customer/live/getHomeLiveUserInfos</string>
     <string name="app_customer_live_getHomeLivetags_url">http://192.168.191.1/customer/live/getHomeUserLiveThemes</string>

@@ -4,7 +4,7 @@ android {
     signingConfigs {
     }
     compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    buildToolsVersion '25.0.3'
     defaultConfig {
         applicationId "com.example.wkj_pc.fitnesslive"
         minSdkVersion 19
@@ -31,6 +31,7 @@ dependencies {
     compile files('libs/mta-sdk-1.6.2.jar')
     compile files('libs/open_sdk_r5509.jar')
     compile project(path: ':library')
+    compile project(path: ':vitamio')
     compile 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:+'
     compile 'fm.jiecao:jiecaovideoplayer:5.5.4'
     compile 'com.android.support:appcompat-v7:25.3.1'
@@ -49,5 +50,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.werb.permissionschecker:permissionschecker:0.0.1-beta2'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
-    compile 'com.charonchui.vitamio:vitamio:4.2.2'
+
+
 }

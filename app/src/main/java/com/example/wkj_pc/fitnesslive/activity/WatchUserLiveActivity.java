@@ -19,7 +19,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.vov.vitamio.LibsChecker;
 import io.vov.vitamio.widget.VideoView;
 
 public class WatchUserLiveActivity extends AppCompatActivity {
@@ -50,12 +49,9 @@ public class WatchUserLiveActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_watch_user_live);
         ButterKnife.bind(this);
-        if (!LibsChecker.checkVitamioLibs(this))
-            return;
-        watchVideoView.setBufferSize(1024);
-        watchVideoView.setVideoQuality(View.DRAWING_CACHE_QUALITY_AUTO);
-        watchVideoView.setHardwareDecoder(true);
         path = getResources().getString(R.string.app_video_upload_srs_server_url);
+       /* if (!LibsChecker.checkVitamioLibs(this))
+            return;*/
         initAmatarLists();
         initAttentionUserShowRecyclerView();
         watchVideoView.setVideoPath(path);

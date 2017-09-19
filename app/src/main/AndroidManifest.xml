@@ -71,7 +71,12 @@
         <activity android:name=".activity.OwnUploadVideoActivity" />
         <activity android:name=".activity.UploadNativeVideoActivity" />
         <activity android:name=".activity.WatchUserLiveActivity" android:windowSoftInputMode="adjustPan" />
-
+        <activity
+            android:name="io.vov.vitamio.activity.InitActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
+            android:launchMode="singleTop"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:windowSoftInputMode="stateAlwaysHidden" />
         <service
             android:name=".service.LoginService"
             android:enabled="true"

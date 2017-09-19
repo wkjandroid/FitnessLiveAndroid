@@ -13,7 +13,9 @@ import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.po.UploadVideo;
 import java.util.List;
 
-import static io.vov.vitamio.provider.MediaStore.Video.Thumbnails.MINI_KIND;
+import static android.provider.MediaStore.Video.Thumbnails.MINI_KIND;
+
+//import static io.vov.vitamio.provider.MediaStore.Video.Thumbnails.MINI_KIND;
 
 /**
  * Created by wkj on 2017/9/13.
