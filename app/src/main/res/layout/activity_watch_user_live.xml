@@ -28,21 +28,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:textSize="10sp"
-                android:layout_marginTop="20dp"
-                android:text="观看人数: 4512"
                 android:id="@+id/watch_people_number"
-                />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginTop="20dp"
+                android:text="观看人数: 0"
+                android:textSize="10sp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:textSize="10sp"
-                android:text="粉丝: 4512"
+                android:text="粉丝: 0"
                 android:id="@+id/watch_fans_people_number"
                 />
         </LinearLayout>

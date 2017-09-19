@@ -57,7 +57,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     @BindView(R.id.live_chatting_message_recycler_view)
     RecyclerView liveChattingMessageRecyclerView;   //直播聊天信息显示
     @BindView(R.id.login_live_logo)     //直播人logo
-            ImageView loginLiveLogo;
+    ImageView loginLiveLogo;
     @BindView(R.id.watch_people_number) //观看直播人数
             TextView watchPeopleNumber;
 
@@ -103,7 +103,8 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
                 MainApplication.loginUser.getNickname()+"/" + MainApplication.loginUser.getNickname()+"/live";
         getWebSocket(messageWebSocketUrl);  //不用开启子线程,自己开启线程
         /*设置直播推流地址*/
-        pushVideoStreamUrl = getResources().getString(R.string.app_video_upload_srs_server_url);
+        pushVideoStreamUrl = getResources().getString(R.string.app_video_upload_srs_server_url)+"/"+
+                MainApplication.loginUser.getAccount();
         mPublisher = new SrsPublisher((SrsCameraView) findViewById(R.id.live_view));
         if (null!=MainApplication.loginUser.getAmatar()){
             Glide.with(this).load(MainApplication.loginUser.getAmatar()).asBitmap().into(loginLiveLogo);
@@ -112,6 +113,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         initAmatartLists();
         /*设置观看者横向显示*/
         initAmatartRecyclerView();
+        fansPeopleNumber.setText("粉丝: "+MainApplication.loginUser.getFansnum());
         /*设置聊天信息展示*/
         initChattingMessageShowRecyclerView();
         mPublishBtn.setOnClickListener(this);
@@ -120,7 +122,109 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         closeLiveIconBtn.setOnClickListener(this);
         initBeautySpinner();
     }
+    /* 直播间聊天websocket*/
+    public void getWebSocket(String address){
+        System.out.println("WebSocketUtils client start");
+        Request request=new Request.Builder().url(address)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newWebSocket(request, new WebSocketListener() {
+            @Override
+            public void onOpen(WebSocket webSocket, Response response) {
+                super.onOpen(webSocket, response);
+                baseWebSocket=webSocket;
+                sendPingToServer();
+                System.out.println("WebSocketUtils client onOpen\"+\"client request header:\" + response.request().headers()\n" +
+                        "                +\"client response header:\" + response.headers()+\"client response:\" + response");
+                LogUtils.logDebug("WebSocketUtils","client onOpen"+"client request header:" + response.request().headers()
+                        +"client response header:" + response.headers()+"client response:" + response);
+            }
+            @Override
+            public void onMessage(WebSocket webSocket, String text) {
+                super.onMessage(webSocket, text);
+                System.out.println("----------"+text);
+               /*处理收到的信息*/
+                if (TextUtils.isEmpty(text)) //收到信息为空时，获取 /*如果收到信息为空，则返回不处理*/
+                    return;
+                /*如果返回信息为success，表示websocket连接建立成功，发送提示信息*/
+                if (text.contentEquals("success")){
+                    LiveChattingMessage message=new LiveChattingMessage();
+                    message.setMid(0);
+                    message.setFrom(MainApplication.loginUser.getNickname());
+                    message.setTo("server");
+                    message.setContent("来到直播间！");
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd:HH/mm/SS");
+                    message.setTime(format.format(new Date()));
+                    message.setIntent(1);
+                    webSocket.send( GsonUtils.getGson().toJson(message));
+                }else {
+                    try{
+                        message = GsonUtils.getGson().fromJson(text, LiveChattingMessage.class);
+                        if (message.getIntent()==1){    //聊天
+                            liveMessages.add(message);
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    adapter.notifyItemInserted(liveMessages.size()-1);
+                                    liveChattingMessageRecyclerView.scrollToPosition(liveMessages.size()-1);
+                                }
+                            });
+                        }else if (message.getIntent()==2){  //粉丝
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    fansPeopleNumber.setText("粉丝:"+message.getFansnumber());
+                                }
+                            });
+                        }else if (message.getIntent()==3) {   //当前在线人数
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    watchPeopleNumber.setText("观看人数:"+message.getFansnumber());
+                                }
+                            });
 
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+            @Override
+            public void onClosing(WebSocket webSocket, int code, String reason) {
+                super.onClosing(webSocket, code, reason);
+                baseWebSocket=null;
+                LogUtils.logDebug("WebSocketUtils","client onClosing"+"code:" + code + " reason:" + reason);
+                System.out.println("WebSocketUtils"+"client onClosing"+"code:" + code + " reason:" + reason);
+            }
+            @Override
+            public void onClosed(WebSocket webSocket, int code, String reason) {
+                super.onClosed(webSocket, code, reason);
+                baseWebSocket=null;
+                LogUtils.logDebug("webSocketUtils","client onClosed"+"code:" + code + " reason:" + reason);
+                System.out.println("webSocketUtils"+"client onClosed"+"code:" + code + " reason:" + reason);
+            }
+            @Override
+            public void onFailure(WebSocket webSocket, Throwable t, Response response) {
+                super.onFailure(webSocket, t, response);
+                baseWebSocket=null;
+                //出现异常会进入此回调
+                LogUtils.logDebug("WebSocketUtils","client onFailure"+"throwable:" + t);
+                System.out.println("WebSocketUtils"+"client onFailure"+"throwable:" + t);
+            }
+        });
+    };
+    //设置心跳防止websocket断线
+    public void sendPingToServer(){
+        Timer timer=new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (null!=baseWebSocket){
+                    baseWebSocket.send("");
+                }
+            }
+        },0,3000);
+    }
     /* 初始化观看者头像 */
     private void initAmatartLists() {
         for (int i = 0; i < 10; i++) {
@@ -370,104 +474,5 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         }
         mPublisher.startCamera();
     }
-/* 直播间聊天websocket*/
-    public void getWebSocket(String address){
-        System.out.println("WebSocketUtils client start");
-        Request request=new Request.Builder().url(address)
-                .build();
-        OkHttpClientFactory.getOkHttpClientInstance().newWebSocket(request, new WebSocketListener() {
-            @Override
-            public void onOpen(WebSocket webSocket, Response response) {
-                super.onOpen(webSocket, response);
-                baseWebSocket=webSocket;
-                sendPingToServer();
-                System.out.println("WebSocketUtils client onOpen\"+\"client request header:\" + response.request().headers()\n" +
-                        "                +\"client response header:\" + response.headers()+\"client response:\" + response");
-                LogUtils.logDebug("WebSocketUtils","client onOpen"+"client request header:" + response.request().headers()
-                        +"client response header:" + response.headers()+"client response:" + response);
-            }
-            @Override
-            public void onMessage(WebSocket webSocket, String text) {
-                super.onMessage(webSocket, text);
-                LogUtils.logDebug("WebSocketUtils","text"+text);
-                System.out.println("----------"+text);
-               /*处理收到的信息*/
-                if (text!=null && text!="" )
-                {
-                    /*如果返回信息为success，表示websocket连接建立成功，发送提示信息*/
-                    if (text.contentEquals("success")){
-                        LiveChattingMessage message=new LiveChattingMessage();
-                        message.setMid(0);
-                        message.setFrom(MainApplication.loginUser.getNickname());
-                        message.setTo("server");
-                        message.setContent("来到直播间！");
-                        SimpleDateFormat format = new SimpleDateFormat("yyyy/MM/dd:HH/mm/SS");
-                        message.setTime(format.format(new Date()));
-                        message.setIntent(1);
-                        webSocket.send( GsonUtils.getGson().toJson(message));
-                    }else {
-                        try{
-                            message = GsonUtils.getGson().fromJson(text, LiveChattingMessage.class);
-                            if (message.getIntent()==1){    //聊天
-                                liveMessages.add(message);
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        adapter.notifyItemInserted(liveMessages.size()-1);
-                                        liveChattingMessageRecyclerView.scrollToPosition(liveMessages.size()-1);
-                                    }
-                                });
-                            }else if (message.getIntent()==2){  //粉丝
-                                runOnUiThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        fansPeopleNumber.setText("粉丝数:"+message.getFansnumber());
-                                    }
-                                });
-                            }else if (message.getIntent()==3) {   //当前在线人数
 
-                            }
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-                    }
-                } else{ //收到信息为空时，获取 /*如果收到信息为空，则返回不处理*/
-                }
-            }
-            @Override
-            public void onClosing(WebSocket webSocket, int code, String reason) {
-                super.onClosing(webSocket, code, reason);
-                baseWebSocket=null;
-                LogUtils.logDebug("WebSocketUtils","client onClosing"+"code:" + code + " reason:" + reason);
-                System.out.println("WebSocketUtils"+"client onClosing"+"code:" + code + " reason:" + reason);
-            }
-            @Override
-            public void onClosed(WebSocket webSocket, int code, String reason) {
-                super.onClosed(webSocket, code, reason);
-                baseWebSocket=null;
-                LogUtils.logDebug("webSocketUtils","client onClosed"+"code:" + code + " reason:" + reason);
-                System.out.println("webSocketUtils"+"client onClosed"+"code:" + code + " reason:" + reason);
-            }
-            @Override
-            public void onFailure(WebSocket webSocket, Throwable t, Response response) {
-                super.onFailure(webSocket, t, response);
-                baseWebSocket=null;
-                //出现异常会进入此回调
-                LogUtils.logDebug("WebSocketUtils","client onFailure"+"throwable:" + t);
-                System.out.println("WebSocketUtils"+"client onFailure"+"throwable:" + t);
-            }
-        });
-    };
-    //设置心跳防止websocket断线
-    public void sendPingToServer(){
-        Timer timer=new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (null!=baseWebSocket){
-                    baseWebSocket.send("");
-                }
-            }
-        },0,3000);
-    }
 }
