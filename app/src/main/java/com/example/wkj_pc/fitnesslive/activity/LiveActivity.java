@@ -60,7 +60,6 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     ImageView loginLiveLogo;
     @BindView(R.id.watch_people_number) //观看直播人数
             TextView watchPeopleNumber;
-
     @BindView(R.id.attention_user_show_recycler_view)   //观众的logo
             RecyclerView attentionUserRcyclerView;
     @BindView(R.id.change_beauty_spinner)   //改变滤镜
@@ -77,8 +76,8 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             LinearLayout bottomLiveShowlinearLayout;
 
     private SrsCameraView liveView;
-    private String[] clarifyitems = new String[]{"BEAUTY", "COOL", "EARLYBIRD", "EVERGREEN", "N1977", "NOSTALGIA", "ROMANCE", "SUNRISE",
-            "SUNSET", "TENDER", "TOASTER2", "VALENCIA", "WALDEN", "WARM", "NONE"};
+    private String[] clarifyitems = new String[]{"BEAUTY", "COOL", "EARLYBIRD", "EVERGREEN", "N1977", "NOSTALGIA",
+            "ROMANCE", "SUNRISE", "SUNSET", "TENDER", "TOASTER2", "VALENCIA", "WALDEN", "WARM", "NONE"};
     //滤镜类型
     private Button mEncoderBtn; //编码按钮
     private String pushVideoStreamUrl;  //srs服务器推流地址
@@ -99,12 +98,14 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         ButterKnife.bind(this);
         /* 获取websocket地址，设置聊天*/
         fansPeopleNumber= (TextView) findViewById(R.id.fans_people_number);
-        messageWebSocketUrl = getResources().getString(R.string.app_message_websocket_url_edit) +
+        messageWebSocketUrl = getResources().getString(R.string.app_message_websocket_customer_live_url) +
                 MainApplication.loginUser.getNickname()+"/" + MainApplication.loginUser.getNickname()+"/live";
         getWebSocket(messageWebSocketUrl);  //不用开启子线程,自己开启线程
         /*设置直播推流地址*/
+
         pushVideoStreamUrl = getResources().getString(R.string.app_video_upload_srs_server_url)+"/"+
                 MainApplication.loginUser.getAccount();
+
         mPublisher = new SrsPublisher((SrsCameraView) findViewById(R.id.live_view));
         if (null!=MainApplication.loginUser.getAmatar()){
             Glide.with(this).load(MainApplication.loginUser.getAmatar()).asBitmap().into(loginLiveLogo);

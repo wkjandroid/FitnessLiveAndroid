@@ -19,7 +19,7 @@
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/login_watch_live_logo"
+            android:id="@+id/watcher_login_watch_live_logo"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:src="@mipmap/ic_amatar_img"
@@ -28,9 +28,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
             <TextView
-                android:id="@+id/watch_people_number"
+                android:id="@+id/watcher_watch_people_number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
@@ -44,44 +43,58 @@
                 android:layout_marginLeft="10dp"
                 android:textSize="10sp"
                 android:text="粉丝: 0"
-                android:id="@+id/watch_fans_people_number"
+                android:id="@+id/watcher_watch_fans_people_number"
                 />
         </LinearLayout>
+        <!--观看页面用户的头像显示-->
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/attention_user_watch_show_recycler_view"
+            android:id="@+id/watcher_attention_user_watch_show_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
     </LinearLayout>
+    <!--下方用户聊天区域-->
     <LinearLayout
         android:layout_width="match_parent"
+        android:orientation="vertical"
         android:layout_alignParentBottom="true"
-        android:id="@+id/begin_watch_live_show_linearlayout"
         android:layout_marginBottom="10dp"
         android:layout_height="wrap_content">
-        <EditText
-            android:id="@+id/watch_video_comment_edit_text"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="7"
-            android:layout_marginLeft="10dp"
-            android:hint="@string/app_edit_comment_text"
-            />
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:id="@+id/ic_send_watch_comment_message_icon"
-            android:layout_marginRight="20dp"
-            android:src="@mipmap/ic_send_comment_message_icon"
-            />
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_marginRight="10dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/close_watch_live_icon"
-            android:src="@mipmap/ic_close_live_icon"
-            />
+        <!--聊天信息展示-->
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="130dp"
+            android:id="@+id/watcher_live_chatting_message_recycler_view"
+            >
+        </android.support.v7.widget.RecyclerView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/watcher_watch_video_chatting_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="7"
+                android:layout_marginLeft="10dp"
+                android:hint="@string/app_edit_comment_text"
+                />
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:id="@+id/watcher_ic_send_watch_comment_message_icon"
+                android:layout_marginRight="20dp"
+                android:src="@mipmap/ic_send_comment_message_icon"
+                />
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_marginRight="10dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/watcher_close_watch_live_icon"
+                android:src="@mipmap/ic_close_live_icon"
+                />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
