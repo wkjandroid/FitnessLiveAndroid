@@ -63,13 +63,16 @@ public class MainPageFragment extends Fragment implements View.OnClickListener{
             }
         }
     };
+    private String getHomeLiveUserInfoUrl;
+    private String getHomeLiveUserTagUrl;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         manager=getFragmentManager();
-        final String getHomeLiveUserInfoUrl=getResources().getString(R.string.app_customer_live_getHomeLiveUserInfos_url);
-        final String getHomeLiveUserTagUrl = getResources().getString(R.string.app_customer_live_getHomeLivetags_url);
-        getLiveInfos(getHomeLiveUserTagUrl,getHomeLiveUserInfoUrl);
+        getHomeLiveUserInfoUrl = getResources().getString(R.string.app_customer_live_getHomeLiveUserInfos_url);
+        getHomeLiveUserTagUrl = getResources().getString(R.string.app_customer_live_getHomeLivetags_url);
+        getLiveInfos(getHomeLiveUserTagUrl, getHomeLiveUserInfoUrl);
     }
     @Override
     public void onResume() {

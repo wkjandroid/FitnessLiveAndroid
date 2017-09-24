@@ -89,7 +89,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     private SrsPublisher mPublisher;       //直播推流发着者
     private WebSocket baseWebSocket; //聊天用websocket
     public  List<LiveChattingMessage> liveMessages = new ArrayList<>();//直播聊天信息
-    private LiveChattingMessagesAdapter adapter;
+    private LiveChattingMessagesAdapter chattingAdapter;
     private LiveChattingMessage message;
     private TextView fansPeopleNumber;//粉丝数量
     private String closeLiveStatusUrl;
@@ -171,7 +171,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    adapter.notifyItemInserted(liveMessages.size()-1);
+                                    chattingAdapter.notifyItemInserted(liveMessages.size()-1);
                                     liveChattingMessageRecyclerView.scrollToPosition(liveMessages.size()-1);
                                 }
                             });
@@ -251,8 +251,8 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     public void initChattingMessageShowRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         liveChattingMessageRecyclerView.setLayoutManager(layoutManager);
-        adapter = new LiveChattingMessagesAdapter(liveMessages);
-        liveChattingMessageRecyclerView.setAdapter(adapter);
+        chattingAdapter = new LiveChattingMessagesAdapter(liveMessages);
+        liveChattingMessageRecyclerView.setAdapter(chattingAdapter);
     }
 
     /*  设置发布直播视频*/

@@ -9,19 +9,16 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.AttentionUserAdapter;
 import com.example.wkj_pc.fitnesslive.adapter.LiveChattingMessagesAdapter;
 import com.example.wkj_pc.fitnesslive.po.LiveChattingMessage;
-import com.example.wkj_pc.fitnesslive.tools.AlertDialogTools;
 import com.example.wkj_pc.fitnesslive.tools.AlertProgressDialogUtils;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LogUtils;
 import com.example.wkj_pc.fitnesslive.tools.OkHttpClientFactory;
-import com.example.wkj_pc.fitnesslive.tools.ToastUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -54,37 +51,41 @@ public class WatchUserLiveActivity extends AppCompatActivity {
     RecyclerView watcherAttentionUserWatchShowRecyclerView;
     @BindView(R.id.watcher_watch_video_chatting_edit_text)
     EditText watcherWatchVideoChattingEditText;
-
     @BindView(R.id.watcher_live_chatting_message_recycler_view)
     RecyclerView watcherLiveChattingMessageRecyclerView;
+    @BindView(R.id.watcher_while_live_close_show_text_view)
+    TextView watcherWhileLiveCloseShowTextView;
+    @BindView(R.id.watcher_ic_send_watch_comment_message_icon)
+    ImageView watcherIcSendWatchCommentMessageIcon;
+    @BindView(R.id.watcher_close_watch_live_icon)
+    ImageView watcherCloseWatchLiveIcon;
     private String watcherVideoUrl;    //拉取rmtp流的网络地址
     List<Integer> amatartLists;
     private String watchChattingWsUrl;  //观看者websocket地址
     private WebSocket baseWebSocket;//直播websocket
-    private LiveChattingMessage message;
-    private List<LiveChattingMessage> liveMessages = new ArrayList<>();//直播聊天信息;
-    private LiveChattingMessagesAdapter adapter;
-    private String liveUserAccount;
-    private Timer timer;
+    private LiveChattingMessage message;    //直播聊天信息;
+    private List<LiveChattingMessage> liveMessages ;//直播聊天信息链表
+    private LiveChattingMessagesAdapter chattingAdapter;    //直播聊天信息适配器
+    private String liveUserAccount; //直播用户的账户
+    private Timer timer;    //定时访问websocket防止断线
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_watch_user_live);
         ButterKnife.bind(this);
-        adapter = new LiveChattingMessagesAdapter(liveMessages);
         liveUserAccount = getIntent().getStringExtra("liveuseraccount");
-        ToastUtils.showToast(this,liveUserAccount,Toast.LENGTH_SHORT);
-        watcherVideoUrl = getResources().getString(R.string.app_video_upload_srs_server_url)+liveUserAccount;
-        watchChattingWsUrl = getResources().getString(R.string.app_message_websocket_customer_live_url)+
-                liveUserAccount+"/"+MainApplication.loginUser.getAccount() + "/watchlive";
+        liveMessages = new ArrayList<>();
+        watcherVideoUrl = getResources().getString(R.string.app_video_upload_srs_server_url) + liveUserAccount;
+        watchChattingWsUrl = getResources().getString(R.string.app_message_websocket_customer_live_url) +
+                liveUserAccount + "/" + MainApplication.loginUser.getAccount() + "/watchlive";
        /* if (!LibsChecker.checkVitamioLibs(this))websocket/liveaccount/watchaccount/live|watchlive
             return;*/
         initAmatarLists();
         initAttentionUserShowRecyclerView();
         watchVideoView.setVideoPath(watcherVideoUrl);   //设置用户拉取视频流地址
         watchVideoView.setBufferSize(1024);
-        AlertProgressDialogUtils.alertProgressShow(this,"马上开始...");
+        AlertProgressDialogUtils.alertProgressShow(this, false, "马上开始...");
         watchVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mp) {
@@ -93,8 +94,17 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                 watchVideoView.start();
             }
         });
+        initChattingRecyclerView();
         getWebSocket(watchChattingWsUrl);   //设置用户直播聊天地址
     }
+    /**  设置聊天信息显示 */
+    private void initChattingRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        chattingAdapter = new LiveChattingMessagesAdapter(liveMessages);
+        watcherLiveChattingMessageRecyclerView.setAdapter(chattingAdapter);
+        watcherLiveChattingMessageRecyclerView.setLayoutManager(layoutManager);
+    }
+
     /**
      * 观看者获取websocket，进行直播聊天消息显示更新
      */
@@ -120,10 +130,21 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                /*处理收到的信息*/
                 if (TextUtils.isEmpty(text)) //收到信息为空时，获取 /*如果收到信息为空，则返回不处理*/
                     return;
+                if (text.contentEquals("liveclosed"))
+                {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            AlertProgressDialogUtils.alertProgressClose();
+                            watcherWhileLiveCloseShowTextView.setVisibility(View.VISIBLE);
+                            watcherWatchVideoChattingEditText.setFocusable(false);
+                            watcherIcSendWatchCommentMessageIcon.setFocusable(false);
+                        }
+                    });
+                    return;
+                }
                 /*如果返回信息为success，表示websocket连接建立成功，发送提示信息*/
-                if (text.contentEquals("liveclosed")){
-                    Toast.makeText(WatchUserLiveActivity.this, "直播已经结束", Toast.LENGTH_SHORT).show();
-                }else if (text.contentEquals("success")) {
+                if (text.contentEquals("success")) {
                     LiveChattingMessage message = new LiveChattingMessage();
                     message.setMid(0);
                     message.setFrom(MainApplication.loginUser.getNickname());
@@ -141,7 +162,7 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    adapter.notifyItemInserted(liveMessages.size() - 1);
+                                    chattingAdapter.notifyDataSetChanged();
                                     watcherLiveChattingMessageRecyclerView.scrollToPosition(liveMessages.size() - 1);
                                 }
                             });
@@ -169,23 +190,30 @@ public class WatchUserLiveActivity extends AppCompatActivity {
             public void onClosing(WebSocket webSocket, int code, String reason) {
                 super.onClosing(webSocket, code, reason);
                 baseWebSocket = null;
-                LogUtils.logDebug("WebSocketUtils", "client onClosing" + "code:" + code + " reason:" + reason);
-                System.out.println("WebSocketUtils" + "client onClosing" + "code:" + code + " reason:" + reason);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        watcherWhileLiveCloseShowTextView.setVisibility(View.VISIBLE);
+                        watcherWatchVideoChattingEditText.setFocusable(false);
+                        watcherIcSendWatchCommentMessageIcon.setFocusable(false);
+                        for (int i=0;i<MainApplication.liveUsers.size();i++){
+                            if (MainApplication.liveUsers.get(i).getAccount().contentEquals(liveUserAccount)){
+                                MainApplication.liveUsers.remove(i);
+                                break;
+                            }
+                        }
+                    }
+                });
             }
             @Override
             public void onClosed(WebSocket webSocket, int code, String reason) {
                 super.onClosed(webSocket, code, reason);
                 baseWebSocket = null;
-                LogUtils.logDebug("webSocketUtils", "client onClosed" + "code:" + code + " reason:" + reason);
-                System.out.println("webSocketUtils" + "client onClosed" + "code:" + code + " reason:" + reason);
             }
             @Override
             public void onFailure(WebSocket webSocket, Throwable t, Response response) {
                 super.onFailure(webSocket, t, response);
                 baseWebSocket = null;
-                //出现异常会进入此回调
-                LogUtils.logDebug("WebSocketUtils", "client onFailure" + "throwable:" + t);
-                System.out.println("WebSocketUtils" + "client onFailure" + "throwable:" + t);
             }
         });
     }
@@ -214,7 +242,6 @@ public class WatchUserLiveActivity extends AppCompatActivity {
         watcherAttentionUserWatchShowRecyclerView.setLayoutManager(manager);
         watcherAttentionUserWatchShowRecyclerView.setAdapter(adapter);
     }
-
     @OnClick({R.id.watcher_login_watch_live_logo, R.id.watcher_ic_send_watch_comment_message_icon,
             R.id.watcher_close_watch_live_icon})
     public void onViewClicked(View view) {
@@ -223,22 +250,22 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                 break;
             case R.id.watcher_ic_send_watch_comment_message_icon:
                 String editTextMsg = watcherWatchVideoChattingEditText.getText().toString().trim();
-                if (TextUtils.isEmpty(editTextMsg)){
+                if (TextUtils.isEmpty(editTextMsg)) {
                     return;
                 }
-                final LiveChattingMessage sendMsg=new LiveChattingMessage();
+                final LiveChattingMessage sendMsg = new LiveChattingMessage();
                 sendMsg.setFrom(MainApplication.loginUser.getNickname());
                 sendMsg.setContent(editTextMsg);
                 sendMsg.setTo("server");
                 sendMsg.setMid(0);
                 sendMsg.setIntent(1);
-                SimpleDateFormat format=new SimpleDateFormat("HH:mm:ss");
+                SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss");
                 sendMsg.setTime(format.format(new Date()));
-                if (null!=baseWebSocket){
-                    baseWebSocket.send( GsonUtils.getGson().toJson(sendMsg));
-                }else{
+                if (null != baseWebSocket) {
+                    baseWebSocket.send(GsonUtils.getGson().toJson(sendMsg));
+                } else {
                     getWebSocket(watchChattingWsUrl);
-                    baseWebSocket.send( GsonUtils.getGson().toJson(sendMsg));
+                    baseWebSocket.send(GsonUtils.getGson().toJson(sendMsg));
                 }
                 watcherWatchVideoChattingEditText.setText("");
                 break;
@@ -247,12 +274,11 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                 break;
         }
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         timer.cancel();
-        if (null!=baseWebSocket){
+        if (null != baseWebSocket) {
             baseWebSocket.cancel();
         }
     }

@@ -88,7 +88,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         File file = new File(path);
         try {
             FileInputStream stream = new FileInputStream(new File(path));
-            AlertProgressDialogUtils.alertProgressShow(this,"正在上传中");
+            AlertProgressDialogUtils.alertProgressShow(this,false,"正在上传中");
             OkHttpUtils.post()
                     .addFile("file", "uploadvideo", file)//
                     .url(uploadVideoUrl)
