@@ -14,6 +14,7 @@ import okhttp3.Callback;
 import okhttp3.FormBody;
 import okhttp3.Request;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 
 /**
  * Created by wkj_pc on 2017/6/13.
@@ -200,6 +201,17 @@ public class LoginUtils {
                 .add("account", account)
                 .build();
         Request request=new Request.Builder().url(closeLiveStatusUrl)
+                .post(body)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
+
+    public static void getLiveUserInfo(String getLiveuserInfoUrl, String liveUserAccount, Callback callback) {
+        RequestBody body=new FormBody.Builder()
+                .add("account",liveUserAccount)
+                .build();
+        Request request=new Request.Builder()
+                .url(getLiveuserInfoUrl)
                 .post(body)
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);

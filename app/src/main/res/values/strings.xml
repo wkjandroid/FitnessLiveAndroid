@@ -33,5 +33,5 @@
     <string name="app_customer_live_uploadUserVideoUrl">http://192.168.191.1/customer/live/uploadRecoderVideo</string>
     <string name="app_customer_live_getUserUploadVideoUrl">http://192.168.191.1/customer/live/getUserUploadVideo</string>
     <string name="app_customer_live_closeLiveStatusUrl">http://192.168.191.1/customer/live/closeLiveStatus</string>
-
+    <string name="app_customer_live_getLiveUserInfo_url">http://192.168.191.1/customer/live/getLiveUserInfo</string>
 </resources>

@@ -15,11 +15,14 @@ import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.AttentionUserAdapter;
 import com.example.wkj_pc.fitnesslive.adapter.LiveChattingMessagesAdapter;
 import com.example.wkj_pc.fitnesslive.po.LiveChattingMessage;
+import com.example.wkj_pc.fitnesslive.po.User;
 import com.example.wkj_pc.fitnesslive.tools.AlertProgressDialogUtils;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LogUtils;
+import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
 import com.example.wkj_pc.fitnesslive.tools.OkHttpClientFactory;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +35,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.widget.VideoView;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -68,15 +73,18 @@ public class WatchUserLiveActivity extends AppCompatActivity {
     private LiveChattingMessagesAdapter chattingAdapter;    //直播聊天信息适配器
     private String liveUserAccount; //直播用户的账户
     private Timer timer;    //定时访问websocket防止断线
-
+    private User liveuser; //正在直播的用户
+    private String getLiveuserInfoUrl;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_watch_user_live);
         ButterKnife.bind(this);
+        liveuser=new User();//正在直播的用户
         liveUserAccount = getIntent().getStringExtra("liveuseraccount");
         liveMessages = new ArrayList<>();
         watcherVideoUrl = getResources().getString(R.string.app_video_upload_srs_server_url) + liveUserAccount;
+        getLiveuserInfoUrl = getResources().getString(R.string.app_customer_live_getLiveUserInfo_url);
         watchChattingWsUrl = getResources().getString(R.string.app_message_websocket_customer_live_url) +
                 liveUserAccount + "/" + MainApplication.loginUser.getAccount() + "/watchlive";
        /* if (!LibsChecker.checkVitamioLibs(this))websocket/liveaccount/watchaccount/live|watchlive
@@ -109,7 +117,6 @@ public class WatchUserLiveActivity extends AppCompatActivity {
      * 观看者获取websocket，进行直播聊天消息显示更新
      */
     public void getWebSocket(String address) {
-        System.out.println("WebSocketUtils client start");
         Request request = new Request.Builder().url(address)
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newWebSocket(request, new WebSocketListener() {
@@ -118,10 +125,6 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                 super.onOpen(webSocket, response);
                 baseWebSocket = webSocket;
                 sendPingToServer();
-                System.out.println("WebSocketUtils client onOpen\"+\"client request header:\" + response.request().headers()\n" +
-                        "                +\"client response header:\" + response.headers()+\"client response:\" + response");
-                LogUtils.logDebug("WebSocketUtils", "client onOpen" + "client request header:" + response.request().headers()
-                        + "client response header:" + response.headers() + "client response:" + response);
             }
             @Override
             public void onMessage(WebSocket webSocket, String text) {
@@ -177,6 +180,13 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    watcherWatchPeopleNumber.setText("观看人数ffff:" + message.getFansnumber());
+                                }
+                            });
+                        }else if (message.getIntent() == 4) {   //用户头像地址
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
                                     watcherWatchPeopleNumber.setText("观看人数:" + message.getFansnumber());
                                 }
                             });
@@ -216,18 +226,6 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                 baseWebSocket = null;
             }
         });
-    }
-    //设置心跳防止websocket断线
-    public void sendPingToServer() {
-        timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (null != baseWebSocket) {
-                    baseWebSocket.send("");
-                }
-            }
-        }, 0, 3000);
     }
     private void initAmatarLists() {
         amatartLists = new ArrayList<>();
@@ -274,6 +272,18 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                 break;
         }
     }
+    //设置心跳防止websocket断线
+    public void sendPingToServer() {
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (null != baseWebSocket) {
+                    baseWebSocket.send("");
+                }
+            }
+        }, 0, 3000);
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -282,4 +292,5 @@ public class WatchUserLiveActivity extends AppCompatActivity {
             baseWebSocket.cancel();
         }
     }
+
 }

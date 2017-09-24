@@ -19,7 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
@@ -186,6 +185,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
+                                    System.out.println("观看人数:"+message.getFansnumber());
                                     watchPeopleNumber.setText("观看人数:"+message.getFansnumber());
                                 }
                             });
@@ -199,26 +199,78 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             public void onClosing(WebSocket webSocket, int code, String reason) {
                 super.onClosing(webSocket, code, reason);
                 baseWebSocket=null;
-                LogUtils.logDebug("WebSocketUtils","client onClosing"+"code:" + code + " reason:" + reason);
-                System.out.println("WebSocketUtils"+"client onClosing"+"code:" + code + " reason:" + reason);
             }
             @Override
             public void onClosed(WebSocket webSocket, int code, String reason) {
                 super.onClosed(webSocket, code, reason);
                 baseWebSocket=null;
-                LogUtils.logDebug("webSocketUtils","client onClosed"+"code:" + code + " reason:" + reason);
-                System.out.println("webSocketUtils"+"client onClosed"+"code:" + code + " reason:" + reason);
             }
             @Override
             public void onFailure(WebSocket webSocket, Throwable t, Response response) {
                 super.onFailure(webSocket, t, response);
                 baseWebSocket=null;
-                //出现异常会进入此回调
-                LogUtils.logDebug("WebSocketUtils","client onFailure"+"throwable:" + t);
-                System.out.println("WebSocketUtils"+"client onFailure"+"throwable:" + t);
             }
         });
     };
+    /* 初始化观看者头像 */
+    private void initAmatartLists() {
+        for (int i = 0; i < 10; i++) {
+            amatarLists.add(R.drawable.head_img);
+        }
+    }
+    /* 设置观众和直播员头像显示 */
+    private void initAmatartRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        attentionUserRcyclerView.setLayoutManager(layoutManager);
+        AttentionUserAdapter adapter = new AttentionUserAdapter(amatarLists);
+        attentionUserRcyclerView.setAdapter(adapter);
+    }
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.start_live_btn:
+                //开始
+                mPublishBtn.setVisibility(View.GONE);
+                bottomLiveShowlinearLayout.setVisibility(View.VISIBLE);
+                mPublisher.startPublish(pushVideoStreamUrl);
+                mPublisher.startCamera();
+                break;
+            //停止推流
+            case R.id.close_live_icon:
+                mPublisher.stopRecord();
+                mPublisher.stopEncode();
+                mPublisher.stopPublish();
+                mPublisher.stopCamera();
+                finish();
+                break;
+            //切换摄像头
+            case R.id.swCam:
+                mPublisher.switchCameraFace((mPublisher.getCamraId() + 1) % Camera.getNumberOfCameras());
+                break;
+        }
+    }
+    /** 发送直播聊天信息到服务器 */
+    public void sendLiveChattingMessage(View view){
+        String editTextMsg = editText.getText().toString().trim();
+        if (TextUtils.isEmpty(editTextMsg)){
+            return;
+        }
+        final LiveChattingMessage sendMsg=new LiveChattingMessage();
+        sendMsg.setFrom(MainApplication.loginUser.getNickname());
+        sendMsg.setContent(editTextMsg);
+        sendMsg.setTo("server");
+        sendMsg.setMid(0);
+        sendMsg.setIntent(1);
+        SimpleDateFormat format=new SimpleDateFormat("HH:mm:ss");
+        sendMsg.setTime(format.format(new Date()));
+        if (null!=baseWebSocket){
+            baseWebSocket.send(GsonUtils.getGson().toJson(sendMsg));
+        }else{
+           getWebSocket(messageWebSocketUrl);
+           baseWebSocket.send(GsonUtils.getGson().toJson(sendMsg));
+        }
+        editText.setText("");
+    }
     //设置心跳防止websocket断线
     public void sendPingToServer(){
         timer = new Timer();
@@ -231,22 +283,6 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             }
         },0,3000);
     }
-    /* 初始化观看者头像 */
-    private void initAmatartLists() {
-        for (int i = 0; i < 10; i++) {
-            amatarLists.add(R.drawable.head_img);
-        }
-    }
-
-    /* 设置观众和直播员头像显示 */
-    private void initAmatartRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        attentionUserRcyclerView.setLayoutManager(layoutManager);
-        AttentionUserAdapter adapter = new AttentionUserAdapter(amatarLists);
-        attentionUserRcyclerView.setAdapter(adapter);
-    }
-
     /*设置直播聊天信息展示*/
     public void initChattingMessageShowRecyclerView() {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -254,7 +290,44 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         chattingAdapter = new LiveChattingMessagesAdapter(liveMessages);
         liveChattingMessageRecyclerView.setAdapter(chattingAdapter);
     }
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mPublisher.resumeRecord();
+    }
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mPublisher.pauseRecord();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        timer.cancel();
+        if (null!=baseWebSocket)
+        {
+            baseWebSocket.cancel();
+        }
+        LoginUtils.closeLiveStatus(MainApplication.loginUser.getAccount(),closeLiveStatusUrl,new Callback(){
+            @Override
+            public void onFailure(Call call, IOException e) {}
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {}
+        });
+        mPublisher.stopPublish();
+        mPublisher.stopRecord();
+    }
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mPublisher.stopEncode();
+        mPublisher.stopRecord();
+        mPublisher.setScreenOrientation(newConfig.orientation);
+        if (mPublishBtn.getVisibility() == View.GONE) {
+            mPublisher.startEncode();
+        }
+        mPublisher.startCamera();
+    }
     /*  设置发布直播视频*/
     private void initPublisher() {
         //设置编码状态回调
@@ -338,7 +411,6 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         //打开摄像头，开始预览（未推流）
         mPublisher.startCamera();
     }
-
     /*  设置美颜效果*/
     private void initBeautySpinner() {
         final Spinner changeBeautySp = (Spinner) findViewById(R.id.change_beauty_spinner);
@@ -406,89 +478,4 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
-
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.start_live_btn:
-                //开始
-                mPublishBtn.setVisibility(View.GONE);
-                bottomLiveShowlinearLayout.setVisibility(View.VISIBLE);
-                mPublisher.startPublish(pushVideoStreamUrl);
-                mPublisher.startCamera();
-                break;
-            //停止推流
-            case R.id.close_live_icon:
-                mPublisher.stopRecord();
-                mPublisher.stopEncode();
-                mPublisher.stopPublish();
-                mPublisher.stopCamera();
-                finish();
-                break;
-            //切换摄像头
-            case R.id.swCam:
-                mPublisher.switchCameraFace((mPublisher.getCamraId() + 1) % Camera.getNumberOfCameras());
-                break;
-        }
-    }
-    /*发送直播聊天信息到服务器*/
-    public void sendLiveChattingMessage(View view){
-        String editTextMsg = editText.getText().toString().trim();
-        if (TextUtils.isEmpty(editTextMsg)){
-            return;
-        }
-        final LiveChattingMessage sendMsg=new LiveChattingMessage();
-        sendMsg.setFrom(MainApplication.loginUser.getNickname());
-        sendMsg.setContent(editTextMsg);
-        sendMsg.setTo("server");
-        sendMsg.setMid(0);
-        sendMsg.setIntent(1);
-        SimpleDateFormat format=new SimpleDateFormat("HH:mm:ss");
-        sendMsg.setTime(format.format(new Date()));
-        if (null!=baseWebSocket){
-            baseWebSocket.send( GsonUtils.getGson().toJson(sendMsg));
-        }else{
-           getWebSocket(messageWebSocketUrl);
-           baseWebSocket.send( GsonUtils.getGson().toJson(sendMsg));
-        }
-        editText.setText("");
-    }
-    @Override
-    protected void onResume() {
-        super.onResume();
-        mPublisher.resumeRecord();
-    }
-    @Override
-    protected void onPause() {
-        super.onPause();
-        mPublisher.pauseRecord();
-    }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        timer.cancel();
-        if (null!=baseWebSocket)
-        {
-            baseWebSocket.cancel();
-        }
-        LoginUtils.closeLiveStatus(MainApplication.loginUser.getAccount(),closeLiveStatusUrl,new Callback(){
-            @Override
-            public void onFailure(Call call, IOException e) {}
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {}
-        });
-        mPublisher.stopPublish();
-        mPublisher.stopRecord();
-    }
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mPublisher.stopEncode();
-        mPublisher.stopRecord();
-        mPublisher.setScreenOrientation(newConfig.orientation);
-        if (mPublishBtn.getVisibility() == View.GONE) {
-            mPublisher.startEncode();
-        }
-        mPublisher.startCamera();
-    }
-
 }
