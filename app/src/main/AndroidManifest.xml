@@ -27,6 +27,7 @@
         <activity android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -36,8 +37,10 @@
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data android:scheme="1106140497" />
             </intent-filter>
         </activity>
@@ -52,10 +55,13 @@
             android:name=".wxapi.WXEntryActivity"
             android:exported="true"
             android:launchMode="singleTop" />
-        <activity android:name=".activity.VideoPlayerActivity"
+        <activity
+            android:name=".activity.VideoPlayerActivity"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:screenOrientation="portrait" />
-        <activity android:name=".activity.LiveActivity" android:windowSoftInputMode="adjustPan"/>
+        <activity
+            android:name=".activity.LiveActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".activity.SysMessageActivity" />
         <activity android:name=".activity.UserInfoEditActivity" />
         <activity
@@ -70,13 +76,16 @@
         <activity android:name=".activity.UploadVideoActivity" />
         <activity android:name=".activity.OwnUploadVideoActivity" />
         <activity android:name=".activity.UploadNativeVideoActivity" />
-        <activity android:name=".activity.WatchUserLiveActivity" android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".activity.WatchUserLiveActivity"
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="io.vov.vitamio.activity.InitActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.NoTitleBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
+
         <service
             android:name=".service.LoginService"
             android:enabled="true"
@@ -85,6 +94,8 @@
             android:name=".service.LiveService"
             android:enabled="true"
             android:exported="true" />
+
+        <activity android:name=".activity.HomeSearchActivity"></activity>
     </application>
 
 </manifest>

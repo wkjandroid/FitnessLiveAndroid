@@ -28,6 +28,7 @@ import com.example.wkj_pc.fitnesslive.adapter.LiveChattingMessagesAdapter;
 import com.example.wkj_pc.fitnesslive.po.LiveChattingMessage;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LogUtils;
+import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
 import com.example.wkj_pc.fitnesslive.tools.OkHttpClientFactory;
 import com.example.wkj_pc.fitnesslive.tools.ToastUtils;
 import com.github.faucamp.simplertmp.RtmpHandler;
@@ -46,6 +47,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -89,6 +92,9 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     private LiveChattingMessagesAdapter adapter;
     private LiveChattingMessage message;
     private TextView fansPeopleNumber;//粉丝数量
+    private String closeLiveStatusUrl;
+    private Timer timer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,15 +102,15 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         setContentView(R.layout.activity_live);
         ButterKnife.bind(this);
+        closeLiveStatusUrl = getResources().getString(R.string.app_customer_live_closeLiveStatusUrl);
         /* 获取websocket地址，设置聊天*/
         fansPeopleNumber= (TextView) findViewById(R.id.fans_people_number);
         messageWebSocketUrl = getResources().getString(R.string.app_message_websocket_customer_live_url) +
-                MainApplication.loginUser.getNickname()+"/" + MainApplication.loginUser.getNickname()+"/live";
+                MainApplication.loginUser.getAccount()+"/" + MainApplication.loginUser.getAccount()+"/live";
         getWebSocket(messageWebSocketUrl);  //不用开启子线程,自己开启线程
         /*设置直播推流地址*/
 
-        pushVideoStreamUrl = getResources().getString(R.string.app_video_upload_srs_server_url)+"/"+
-                MainApplication.loginUser.getAccount();
+        pushVideoStreamUrl = getResources().getString(R.string.app_video_upload_srs_server_url)+MainApplication.loginUser.getAccount();
 
         mPublisher = new SrsPublisher((SrsCameraView) findViewById(R.id.live_view));
         if (null!=MainApplication.loginUser.getAmatar()){
@@ -183,7 +189,6 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
                                     watchPeopleNumber.setText("观看人数:"+message.getFansnumber());
                                 }
                             });
-
                         }
                     }catch (Exception e){
                         e.printStackTrace();
@@ -216,7 +221,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     };
     //设置心跳防止websocket断线
     public void sendPingToServer(){
-        Timer timer=new Timer();
+        timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -398,8 +403,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
             @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
+            public void onNothingSelected(AdapterView<?> parent) {}
         });
     }
 
@@ -461,6 +465,17 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        timer.cancel();
+        if (null!=baseWebSocket)
+        {
+            baseWebSocket.cancel();
+        }
+        LoginUtils.closeLiveStatus(MainApplication.loginUser.getAccount(),closeLiveStatusUrl,new Callback(){
+            @Override
+            public void onFailure(Call call, IOException e) {}
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {}
+        });
         mPublisher.stopPublish();
         mPublisher.stopRecord();
     }

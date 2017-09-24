@@ -1,6 +1,7 @@
 package com.example.wkj_pc.fitnesslive.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,12 +11,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
+import com.example.wkj_pc.fitnesslive.activity.LoginActivity;
+import com.example.wkj_pc.fitnesslive.activity.WatchUserLiveActivity;
 import com.example.wkj_pc.fitnesslive.po.LiveTheme;
 import com.example.wkj_pc.fitnesslive.po.User;
+import com.example.wkj_pc.fitnesslive.tools.ToastUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,17 +50,30 @@ public class HomeLiveVideoShowAdapter extends RecyclerView.Adapter<HomeLiveVideo
             homeUserLiveNumsShow = (TextView) itemView.findViewById(R.id.home_user_live_num_show_text_view);
             liveUserNicknameShow = (TextView) itemView.findViewById(R.id.home_live_user_nickname_show_text_view);
             homeLiveUserTag = (RecyclerView) itemView.findViewById(R.id.home_live_user_tag_recyclerview);
+            liveUserBigImg.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=null;
+                    if (null==MainApplication.loginUser){
+                        intent=new Intent(context, LoginActivity.class);
+                        context.startActivity(intent);
+                    }else {
+                        intent=new Intent(context, WatchUserLiveActivity.class);
+                        intent.putExtra("liveuseraccount",liveUsers.get(getAdapterPosition()).getAccount());
+                        context.startActivity(intent);
+                    }
+                }
+            });
         }
     }
 
-    public HomeLiveVideoShowAdapter(List<User> homeUserLives) {
-
+    public HomeLiveVideoShowAdapter(List<User> homeUserLives,Context context) {
+        this.context=context;
         liveUsers=homeUserLives;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        context=parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.home_user_live_show_item, parent, false);
         return new ViewHolder(view);
     }

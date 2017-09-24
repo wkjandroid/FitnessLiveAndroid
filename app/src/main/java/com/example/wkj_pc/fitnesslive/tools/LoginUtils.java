@@ -194,4 +194,14 @@ public class LoginUtils {
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
     }
+    /** 关闭用户直播状态*/
+    public static void closeLiveStatus(String account,String closeLiveStatusUrl,Callback callback) {
+        RequestBody body=new FormBody.Builder()
+                .add("account", account)
+                .build();
+        Request request=new Request.Builder().url(closeLiveStatusUrl)
+                .post(body)
+                .build();
+        OkHttpClientFactory.getOkHttpClientInstance().newCall(request).enqueue(callback);
+    }
 }
