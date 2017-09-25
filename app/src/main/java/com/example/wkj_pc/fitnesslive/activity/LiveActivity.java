@@ -165,7 +165,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
                 }else {
                     try{
                         message = GsonUtils.getGson().fromJson(text, LiveChattingMessage.class);
-                        if (message.getIntent()==1){    //聊天
+                        if (message.getIntent() == 1){    //聊天
                             liveMessages.add(message);
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -174,19 +174,20 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
                                     liveChattingMessageRecyclerView.scrollToPosition(liveMessages.size()-1);
                                 }
                             });
-                        }else if (message.getIntent()==2){  //粉丝
+                        }else if (message.getIntent() == 2 ){  //粉丝
+                            final int fansnum=message.getFansnumber();
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    fansPeopleNumber.setText("粉丝:"+message.getFansnumber());
+                                    fansPeopleNumber.setText("粉丝:"+fansnum);
                                 }
                             });
                         }else if (message.getIntent()==3) {   //当前在线人数
+                            final int onlinenum=message.getFansnumber()-1;
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    System.out.println("观看人数:"+message.getFansnumber());
-                                    watchPeopleNumber.setText("观看人数:"+message.getFansnumber());
+                                    watchPeopleNumber.setText("观看人数:"+onlinenum);
                                 }
                             });
                         }
@@ -211,7 +212,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
                 baseWebSocket=null;
             }
         });
-    };
+    }
     /* 初始化观看者头像 */
     private void initAmatartLists() {
         for (int i = 0; i < 10; i++) {

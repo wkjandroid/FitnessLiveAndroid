@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.AttentionUserAdapter;
@@ -35,8 +36,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.widget.VideoView;
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.WebSocket;
@@ -170,24 +169,27 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                                 }
                             });
                         } else if (message.getIntent() == 2) {  //粉丝
+                            final int fansnum=message.getFansnumber();
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    watcherWatchFansPeopleNumber.setText("粉丝:" + message.getFansnumber());
+                                    watcherWatchFansPeopleNumber.setText("粉丝:" + fansnum);
                                 }
                             });
                         } else if (message.getIntent() == 3) {   //当前在线人数
+                            final int onlinenum=message.getFansnumber()-1;
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    watcherWatchPeopleNumber.setText("观看人数ffff:" + message.getFansnumber());
+                                    watcherWatchPeopleNumber.setText("观看人数:" + onlinenum);
                                 }
                             });
                         }else if (message.getIntent() == 4) {   //用户头像地址
+                            final String content=message.getContent();
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    watcherWatchPeopleNumber.setText("观看人数:" + message.getFansnumber());
+                                    Glide.with(WatchUserLiveActivity.this).load(content).asBitmap().into(loginWatchLiveLogo);
                                 }
                             });
                         }
