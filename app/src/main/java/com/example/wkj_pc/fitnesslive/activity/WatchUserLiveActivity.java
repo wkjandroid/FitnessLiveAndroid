@@ -9,28 +9,23 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
-import com.example.wkj_pc.fitnesslive.adapter.AttentionUserAdapter;
+import com.example.wkj_pc.fitnesslive.adapter.WatchUserLiveAdapter;
 import com.example.wkj_pc.fitnesslive.adapter.LiveChattingMessagesAdapter;
 import com.example.wkj_pc.fitnesslive.po.LiveChattingMessage;
 import com.example.wkj_pc.fitnesslive.po.User;
 import com.example.wkj_pc.fitnesslive.tools.AlertProgressDialogUtils;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
-import com.example.wkj_pc.fitnesslive.tools.LogUtils;
-import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
 import com.example.wkj_pc.fitnesslive.tools.OkHttpClientFactory;
-
-import java.io.IOException;
+import com.google.gson.reflect.TypeToken;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -64,7 +59,6 @@ public class WatchUserLiveActivity extends AppCompatActivity {
     @BindView(R.id.watcher_close_watch_live_icon)
     ImageView watcherCloseWatchLiveIcon;
     private String watcherVideoUrl;    //拉取rmtp流的网络地址
-    List<Integer> amatartLists;
     private String watchChattingWsUrl;  //观看者websocket地址
     private WebSocket baseWebSocket;//直播websocket
     private LiveChattingMessage message;    //直播聊天信息;
@@ -74,6 +68,7 @@ public class WatchUserLiveActivity extends AppCompatActivity {
     private Timer timer;    //定时访问websocket防止断线
     private User liveuser; //正在直播的用户
     private String getLiveuserInfoUrl;
+    private List<User> watcherUsers;//观看直播用户的信息集合
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,8 +83,7 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                 liveUserAccount + "/" + MainApplication.loginUser.getAccount() + "/watchlive";
        /* if (!LibsChecker.checkVitamioLibs(this))websocket/liveaccount/watchaccount/live|watchlive
             return;*/
-        initAmatarLists();
-        initAttentionUserShowRecyclerView();
+        initWatcherUserShowRecyclerView();
         watchVideoView.setVideoPath(watcherVideoUrl);   //设置用户拉取视频流地址
         watchVideoView.setBufferSize(1024);
         AlertProgressDialogUtils.alertProgressShow(this, false, "马上开始...");
@@ -176,15 +170,7 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                                     watcherWatchFansPeopleNumber.setText("粉丝:" + fansnum);
                                 }
                             });
-                        } else if (message.getIntent() == 3) {   //当前在线人数
-                            final int onlinenum=message.getFansnumber()-1;
-                            runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    watcherWatchPeopleNumber.setText("观看人数:" + onlinenum);
-                                }
-                            });
-                        }else if (message.getIntent() == 4) {   //用户头像地址
+                        }else if (message.getIntent() == 3) {   //用户头像地址
                             final String content=message.getContent();
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -194,7 +180,18 @@ public class WatchUserLiveActivity extends AppCompatActivity {
                             });
                         }
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        /** 发生异常后，验证时候能装换成用户集合，然后展示在listview中*/
+                        try {
+                            watcherUsers = GsonUtils.getGson().fromJson(text, new TypeToken<List<User>>(){}.getType());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    initWatcherUserShowRecyclerView();
+                                }
+                            });
+                        }catch (Exception e1){
+                            e1.printStackTrace();
+                        }
                     }
                 }
             }
@@ -229,18 +226,15 @@ public class WatchUserLiveActivity extends AppCompatActivity {
             }
         });
     }
-    private void initAmatarLists() {
-        amatartLists = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            amatartLists.add(R.drawable.head_img);
+    private void initWatcherUserShowRecyclerView() {
+        if (null!=watcherUsers){
+            watcherWatchPeopleNumber.setText("观看人数:" + watcherUsers.size());
+            WatchUserLiveAdapter adapter = new WatchUserLiveAdapter(watcherUsers,this);
+            LinearLayoutManager manager = new LinearLayoutManager(this);
+            manager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            watcherAttentionUserWatchShowRecyclerView.setLayoutManager(manager);
+            watcherAttentionUserWatchShowRecyclerView.setAdapter(adapter);
         }
-    }
-    private void initAttentionUserShowRecyclerView() {
-        AttentionUserAdapter adapter = new AttentionUserAdapter(amatartLists);
-        LinearLayoutManager manager = new LinearLayoutManager(this);
-        manager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        watcherAttentionUserWatchShowRecyclerView.setLayoutManager(manager);
-        watcherAttentionUserWatchShowRecyclerView.setAdapter(adapter);
     }
     @OnClick({R.id.watcher_login_watch_live_logo, R.id.watcher_ic_send_watch_comment_message_icon,
             R.id.watcher_close_watch_live_icon})
@@ -294,5 +288,4 @@ public class WatchUserLiveActivity extends AppCompatActivity {
             baseWebSocket.cancel();
         }
     }
-
 }

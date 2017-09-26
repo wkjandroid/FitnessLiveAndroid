@@ -22,15 +22,17 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
-import com.example.wkj_pc.fitnesslive.adapter.AttentionUserAdapter;
+import com.example.wkj_pc.fitnesslive.adapter.WatchUserLiveAdapter;
 import com.example.wkj_pc.fitnesslive.adapter.LiveChattingMessagesAdapter;
 import com.example.wkj_pc.fitnesslive.po.LiveChattingMessage;
+import com.example.wkj_pc.fitnesslive.po.User;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
 import com.example.wkj_pc.fitnesslive.tools.LogUtils;
 import com.example.wkj_pc.fitnesslive.tools.LoginUtils;
 import com.example.wkj_pc.fitnesslive.tools.OkHttpClientFactory;
 import com.example.wkj_pc.fitnesslive.tools.ToastUtils;
 import com.github.faucamp.simplertmp.RtmpHandler;
+import com.google.gson.reflect.TypeToken;
 import com.seu.magicfilter.utils.MagicFilterType;
 import net.ossrs.yasea.SrsCameraView;
 import net.ossrs.yasea.SrsEncodeHandler;
@@ -81,7 +83,6 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     private String[] clarifyitems = new String[]{"BEAUTY", "COOL", "EARLYBIRD", "EVERGREEN", "N1977", "NOSTALGIA",
             "ROMANCE", "SUNRISE", "SUNSET", "TENDER", "TOASTER2", "VALENCIA", "WALDEN", "WARM", "NONE"};
     //滤镜类型
-    private Button mEncoderBtn; //编码按钮
     private String pushVideoStreamUrl;  //srs服务器推流地址
     private List<Integer> amatarLists = new ArrayList<>();  //观看者头像集合
     private String messageWebSocketUrl; //直播聊天传输地址
@@ -93,7 +94,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     private TextView fansPeopleNumber;//粉丝数量
     private String closeLiveStatusUrl;
     private Timer timer;
-
+    private List<User> watcherUsers;//观看人信息
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -116,7 +117,6 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             Glide.with(this).load(MainApplication.loginUser.getAmatar()).asBitmap().into(loginLiveLogo);
         }
         loginLiveLogo.setImageResource(R.mipmap.ic_launcher);
-        initAmatartLists();
         /*设置观看者横向显示*/
         initAmatartRecyclerView();
         fansPeopleNumber.setText("粉丝: "+MainApplication.loginUser.getFansnum());
@@ -182,17 +182,21 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
                                     fansPeopleNumber.setText("粉丝:"+fansnum);
                                 }
                             });
-                        }else if (message.getIntent()==3) {   //当前在线人数
-                            final int onlinenum=message.getFansnumber()-1;
+                        }
+                    }catch (Exception e){
+                        /** 发生异常后，验证时候能装换成用户集合，然后展示在listview中*/
+                        try {
+                            watcherUsers = GsonUtils.getGson().fromJson(text, new TypeToken<List<User>>() {
+                           }.getType());
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    watchPeopleNumber.setText("观看人数:"+onlinenum);
+                                    initAmatartRecyclerView();
                                 }
                             });
+                        }catch (Exception e1){
+                            e1.printStackTrace();
                         }
-                    }catch (Exception e){
-                        e.printStackTrace();
                     }
                 }
             }
@@ -213,19 +217,16 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
     }
-    /* 初始化观看者头像 */
-    private void initAmatartLists() {
-        for (int i = 0; i < 10; i++) {
-            amatarLists.add(R.drawable.head_img);
-        }
-    }
-    /* 设置观众和直播员头像显示 */
+    /** 设置观众和直播员头像显示 */
     private void initAmatartRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        attentionUserRcyclerView.setLayoutManager(layoutManager);
-        AttentionUserAdapter adapter = new AttentionUserAdapter(amatarLists);
-        attentionUserRcyclerView.setAdapter(adapter);
+        if (watcherUsers!=null){
+            watchPeopleNumber.setText("观看人数:"+watcherUsers.size());
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            attentionUserRcyclerView.setLayoutManager(layoutManager);
+            WatchUserLiveAdapter adapter = new WatchUserLiveAdapter(watcherUsers,this);
+            attentionUserRcyclerView.setAdapter(adapter);
+        }
     }
     public void onClick(View view) {
         switch (view.getId()) {
@@ -305,8 +306,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     protected void onDestroy() {
         super.onDestroy();
         timer.cancel();
-        if (null!=baseWebSocket)
-        {
+        if (null!=baseWebSocket) {
             baseWebSocket.cancel();
         }
         LoginUtils.closeLiveStatus(MainApplication.loginUser.getAccount(),closeLiveStatusUrl,new Callback(){

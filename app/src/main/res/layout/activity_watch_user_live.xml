@@ -28,8 +28,8 @@
         android:layout_alignParentTop="true"
         android:orientation="horizontal">
         <de.hdodenhof.circleimageview.CircleImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:id="@+id/watcher_login_watch_live_logo"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
@@ -63,7 +63,9 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/watcher_attention_user_watch_show_recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_height="match_parent"
             />
     </LinearLayout>
     <!--下方用户聊天区域-->
