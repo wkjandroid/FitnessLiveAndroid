@@ -14,6 +14,8 @@ import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.WatchUserLiveAdapter;
 import com.example.wkj_pc.fitnesslive.adapter.LiveChattingMessagesAdapter;
+import com.example.wkj_pc.fitnesslive.fragment.BottomSheetDialogFrag;
+import com.example.wkj_pc.fitnesslive.fragment.LiveUserBottomInfoToastFragment;
 import com.example.wkj_pc.fitnesslive.po.LiveChattingMessage;
 import com.example.wkj_pc.fitnesslive.po.User;
 import com.example.wkj_pc.fitnesslive.tools.AlertProgressDialogUtils;
@@ -37,6 +39,7 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
 public class WatchUserLiveActivity extends AppCompatActivity {
+
 
     @BindView(R.id.watch_video_view)
     VideoView watchVideoView;
@@ -240,7 +243,9 @@ public class WatchUserLiveActivity extends AppCompatActivity {
             R.id.watcher_close_watch_live_icon})
     public void onViewClicked(View view) {
         switch (view.getId()) {
+            /** 点击直播用户头像，弹出信息*/
             case R.id.watcher_login_watch_live_logo:
+                 new LiveUserBottomInfoToastFragment().show(getSupportFragmentManager(),"dialog");
                 break;
             case R.id.watcher_ic_send_watch_comment_message_icon:
                 String editTextMsg = watcherWatchVideoChattingEditText.getText().toString().trim();

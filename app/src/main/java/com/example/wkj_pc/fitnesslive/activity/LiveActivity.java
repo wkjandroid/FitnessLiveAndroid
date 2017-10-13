@@ -24,6 +24,8 @@ import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.WatchUserLiveAdapter;
 import com.example.wkj_pc.fitnesslive.adapter.LiveChattingMessagesAdapter;
+import com.example.wkj_pc.fitnesslive.fragment.BottomSheetDialogFrag;
+import com.example.wkj_pc.fitnesslive.fragment.LiveUserBottomInfoToastFragment;
 import com.example.wkj_pc.fitnesslive.po.LiveChattingMessage;
 import com.example.wkj_pc.fitnesslive.po.User;
 import com.example.wkj_pc.fitnesslive.tools.GsonUtils;
@@ -123,6 +125,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
         /*设置聊天信息展示*/
         initChattingMessageShowRecyclerView();
         mPublishBtn.setOnClickListener(this);
+        loginLiveLogo.setOnClickListener(this);
         mCameraSwitchBtn.setOnClickListener(this);
         initPublisher();
         closeLiveIconBtn.setOnClickListener(this);
@@ -130,7 +133,6 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     }
     /* 直播间聊天websocket*/
     public void getWebSocket(String address){
-        System.out.println("WebSocketUtils client start");
         Request request=new Request.Builder().url(address)
                 .build();
         OkHttpClientFactory.getOkHttpClientInstance().newWebSocket(request, new WebSocketListener() {
@@ -139,15 +141,10 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
                 super.onOpen(webSocket, response);
                 baseWebSocket=webSocket;
                 sendPingToServer();
-                System.out.println("WebSocketUtils client onOpen\"+\"client request header:\" + response.request().headers()\n" +
-                        "                +\"client response header:\" + response.headers()+\"client response:\" + response");
-                LogUtils.logDebug("WebSocketUtils","client onOpen"+"client request header:" + response.request().headers()
-                        +"client response header:" + response.headers()+"client response:" + response);
             }
             @Override
             public void onMessage(WebSocket webSocket, String text) {
                 super.onMessage(webSocket, text);
-                System.out.println("----------"+text);
                /*处理收到的信息*/
                 if (TextUtils.isEmpty(text)) //收到信息为空时，获取 /*如果收到信息为空，则返回不处理*/
                     return;
@@ -230,6 +227,9 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
     }
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.login_live_logo:
+                new LiveUserBottomInfoToastFragment().show(getSupportFragmentManager(),"dialog");
+                break;
             case R.id.start_live_btn:
                 //开始
                 mPublishBtn.setVisibility(View.GONE);

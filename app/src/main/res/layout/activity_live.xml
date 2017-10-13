@@ -37,7 +37,7 @@
                 android:layout_marginLeft="10dp"
                 android:textSize="15sp"
                 android:textColor="@color/colorToolbar"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="18dp"
                 android:text="观看人数: 0"
                 android:id="@+id/watch_people_number"
                 />

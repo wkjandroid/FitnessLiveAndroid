@@ -69,7 +69,7 @@ public class UserNicknameAndSignEditTools implements View.OnClickListener{
         popupWindow.setClippingEnabled(false);
         popupWindow.showAtLocation(rootView, Gravity.BOTTOM|Gravity.CENTER_HORIZONTAL, 0, 0);
     }
-
+ 
     @Override
     public void onClick(View view) {
         context.getWindow().setBackgroundDrawable( new ColorDrawable(context.getResources().getColor(R.color.color_white)));
