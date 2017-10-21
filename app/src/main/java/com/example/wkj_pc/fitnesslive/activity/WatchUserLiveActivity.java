@@ -14,7 +14,6 @@ import com.example.wkj_pc.fitnesslive.MainApplication;
 import com.example.wkj_pc.fitnesslive.R;
 import com.example.wkj_pc.fitnesslive.adapter.WatchUserLiveAdapter;
 import com.example.wkj_pc.fitnesslive.adapter.LiveChattingMessagesAdapter;
-import com.example.wkj_pc.fitnesslive.fragment.BottomSheetDialogFrag;
 import com.example.wkj_pc.fitnesslive.fragment.LiveUserBottomInfoToastFragment;
 import com.example.wkj_pc.fitnesslive.po.LiveChattingMessage;
 import com.example.wkj_pc.fitnesslive.po.User;
@@ -39,7 +38,6 @@ import okhttp3.WebSocket;
 import okhttp3.WebSocketListener;
 
 public class WatchUserLiveActivity extends AppCompatActivity {
-
 
     @BindView(R.id.watch_video_view)
     VideoView watchVideoView;
@@ -229,16 +227,18 @@ public class WatchUserLiveActivity extends AppCompatActivity {
             }
         });
     }
+    /** 设置观看直播人物的头像显示 */
     private void initWatcherUserShowRecyclerView() {
         if (null!=watcherUsers){
             watcherWatchPeopleNumber.setText("观看人数:" + watcherUsers.size());
-            WatchUserLiveAdapter adapter = new WatchUserLiveAdapter(watcherUsers,this);
+            WatchUserLiveAdapter adapter = new WatchUserLiveAdapter(watcherUsers,this,getSupportFragmentManager());
             LinearLayoutManager manager = new LinearLayoutManager(this);
             manager.setOrientation(LinearLayoutManager.HORIZONTAL);
             watcherAttentionUserWatchShowRecyclerView.setLayoutManager(manager);
             watcherAttentionUserWatchShowRecyclerView.setAdapter(adapter);
         }
     }
+
     @OnClick({R.id.watcher_login_watch_live_logo, R.id.watcher_ic_send_watch_comment_message_icon,
             R.id.watcher_close_watch_live_icon})
     public void onViewClicked(View view) {

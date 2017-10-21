@@ -221,7 +221,7 @@ public class LiveActivity extends AppCompatActivity implements View.OnClickListe
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             layoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
             attentionUserRcyclerView.setLayoutManager(layoutManager);
-            WatchUserLiveAdapter adapter = new WatchUserLiveAdapter(watcherUsers,this);
+            WatchUserLiveAdapter adapter = new WatchUserLiveAdapter(watcherUsers,this,getSupportFragmentManager());
             attentionUserRcyclerView.setAdapter(adapter);
         }
     }

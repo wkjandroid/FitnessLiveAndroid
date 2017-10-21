@@ -3,6 +3,7 @@ package com.example.wkj_pc.fitnesslive.adapter;
 
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +12,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.wkj_pc.fitnesslive.R;
+import com.example.wkj_pc.fitnesslive.fragment.LiveUserBottomInfoToastFragment;
 import com.example.wkj_pc.fitnesslive.po.User;
 import com.example.wkj_pc.fitnesslive.tools.ToastUtils;
 
@@ -24,10 +26,13 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class WatchUserLiveAdapter extends RecyclerView.Adapter<WatchUserLiveAdapter.ViewHolder>{
 
+    private final FragmentManager manager;
     private List<User> watchUsers;
     private Context context;
-    public WatchUserLiveAdapter(List<User> users,Context context){
+    public static User alertUser;
+    public WatchUserLiveAdapter(List<User> users, Context context, FragmentManager manager){
         watchUsers=users;
+        this.manager=manager;
         this.context=context;
     }
     class ViewHolder extends RecyclerView.ViewHolder{
@@ -38,14 +43,14 @@ public class WatchUserLiveAdapter extends RecyclerView.Adapter<WatchUserLiveAdap
             amatar.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ToastUtils.showToast(context,"dianji", Toast.LENGTH_SHORT);
+                    alertUser=watchUsers.get(getAdapterPosition());
+                    new LiveUserBottomInfoToastFragment().show(manager,"dialog");
                 }
             });
         }
     }
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        context = parent.getContext();
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.watch_user_show_reyclerview,parent,false);
         ViewHolder holder=new ViewHolder(view);
         return holder;
