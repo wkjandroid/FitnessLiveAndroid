@@ -23,11 +23,11 @@ public class LiveUserBottomInfoToastFragment extends BottomSheetDialogFragment i
                 view.findViewById(R.id.user_bottom_fragment_attention_info_alert_logo);
         Button attentionBtn = (Button) view.findViewById(R.id.user_bottom_fragment_attention_info_alert_attention_btn);
         attentionBtn.setOnClickListener(this);
-        TextView attentionNum = (TextView) view.findViewById(R.id.user_bottom_fragment_attention_info_alert_attentionnum);
+       /* TextView attentionNum = (TextView) view.findViewById(R.id.user_bottom_fragment_attention_info_alert_attentionnum);
         TextView fansnum = (TextView) view.findViewById(R.id.user_bottom_fragment_attention_info_alert_fansnum);
         TextView nickname = (TextView) view.findViewById(R.id.user_bottom_fragment_attention_info_alert_nickname);
         TextView personalSign = (TextView) view.findViewById(R.id.user_bottom_fragment_attention_info_alert_personalsign);
-        return view;
+       */ return view;
     }
 
     @Override
